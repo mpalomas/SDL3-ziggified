@@ -875,26 +875,8 @@ const SdlOption = struct {
     src_files: []const []const u8,
     system_libs: []const []const u8,
 };
-const render_driver_sw = SdlOption{
-    .name = "render_driver_software",
-    .desc = "enable the software render driver",
-    .default = true,
-    .sdl_configs = &.{},
-    .c_macros = &.{"SDL_VIDEO_RENDER_SW"},
-    .src_files = &.{
-        "src/render/software/SDL_blendfillrect.c",
-        "src/render/software/SDL_blendline.c",
-        "src/render/software/SDL_blendpoint.c",
-        "src/render/software/SDL_drawline.c",
-        "src/render/software/SDL_drawpoint.c",
-        "src/render/software/SDL_render_sw.c",
-        "src/render/software/SDL_rotate.c",
-        "src/render/software/SDL_triangle.c",
-    },
-    .system_libs = &.{},
-};
+
 const linux_options = [_]SdlOption{
-    render_driver_sw,
     .{
         .name = "video_driver_x11",
         .desc = "enable the x11 video driver",
