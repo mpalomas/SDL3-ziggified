@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "sdl_build_config_minimal.h": "c",
+        "sdl_dbus.h": "c"
+    }
+}

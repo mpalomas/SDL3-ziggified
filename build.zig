@@ -6,12 +6,13 @@ pub fn build(b: *std.Build) void {
     const t = target.result;
 
     const lib = b.addStaticLibrary(.{
-        .name = "SDL2",
+        .name = "SDL3",
         .target = target,
         .optimize = optimize,
     });
 
     lib.addIncludePath(b.path("include"));
+    lib.addIncludePath(b.path("src")); // SDL_internal.h and others
     lib.addCSourceFiles(.{ .files = &generic_src_files });
     lib.defineCMacro("SDL_USE_BUILTIN_OPENGL_DEFINITIONS", "1");
     lib.linkLibC();
@@ -60,17 +61,17 @@ pub fn build(b: *std.Build) void {
 
             lib.addIncludePath(b.path(cache_include));
         },
-        else => { },
+        else => {},
     }
 
     const use_pregenerated_config = switch (t.os.tag) {
-        .windows, .macos, .emscripten => true,
+        .windows, .macos, .linux, .emscripten => true,
         else => false,
     };
 
     if (use_pregenerated_config) {
         lib.addIncludePath(b.path("include-pregen"));
-        lib.installHeadersDirectory(b.path("include-pregen"), "SDL2", .{});
+        lib.installHeadersDirectory(b.path("include-pregen"), "SDL3", .{});
         lib.addCSourceFiles(.{ .files = render_driver_sw.src_files });
     } else {
         // causes pregenerated SDL_config.h to assert an error
@@ -83,6 +84,8 @@ pub fn build(b: *std.Build) void {
             .style = .{ .cmake = b.path("include/SDL_config.h.cmake") },
             .include_path = "SDL_config.h",
         }, .{
+            .HAVE_CONST = 1,
+            .HAVE_INLINE = 1,
             .HAVE_STDINT_H = 1,
             .HAVE_SYS_TYPES_H = 1,
             .HAVE_STDIO_H = 1,
@@ -140,55 +143,85 @@ pub fn build(b: *std.Build) void {
         const revision_header = b.addConfigHeader(.{
             .style = .{ .cmake = b.path("include/SDL_revision.h.cmake") },
             .include_path = "SDL_revision.h",
-        }, .{ });
+        }, .{});
         lib.addConfigHeader(revision_header);
         lib.installConfigHeader(revision_header);
     }
-    lib.installHeadersDirectory(b.path("include"), "SDL2", .{});
+    lib.installHeadersDirectory(b.path("include"), "SDL3", .{});
     b.installArtifact(lib);
 }
 
 const generic_src_files = [_][]const u8{
     "src/SDL.c",
     "src/SDL_assert.c",
-    "src/SDL_dataqueue.c",
+    "src/SDL_hashtable.c",
     "src/SDL_error.c",
     "src/SDL_guid.c",
     "src/SDL_hints.c",
     "src/SDL_list.c",
     "src/SDL_log.c",
     "src/SDL_utils.c",
+    "src/SDL_properties.c",
+
     "src/atomic/SDL_atomic.c",
     "src/atomic/SDL_spinlock.c",
+
     "src/audio/SDL_audio.c",
+    "src/audio/SDL_audioqueue.c",
     "src/audio/SDL_audiocvt.c",
     "src/audio/SDL_audiodev.c",
+    "src/audio/SDL_audioresample.c",
     "src/audio/SDL_audiotypecvt.c",
     "src/audio/SDL_mixer.c",
     "src/audio/SDL_wave.c",
+    "src/audio/dummy/SDL_dummyaudio.c",
+
+    "src/core/SDL_core_unsupported.c",
+
     "src/cpuinfo/SDL_cpuinfo.c",
+
     "src/dynapi/SDL_dynapi.c",
+
+    "src/events/SDL_categories.c",
     "src/events/SDL_clipboardevents.c",
     "src/events/SDL_displayevents.c",
     "src/events/SDL_dropevents.c",
     "src/events/SDL_events.c",
-    "src/events/SDL_gesture.c",
     "src/events/SDL_keyboard.c",
+    "src/events/SDL_keymap.c",
     "src/events/SDL_keysym_to_scancode.c",
     "src/events/SDL_mouse.c",
-    "src/events/SDL_quit.c",
-    "src/events/SDL_scancode_tables.c",
-    "src/events/SDL_touch.c",
-    "src/events/SDL_windowevents.c",
-    "src/events/imKStoUCS.c",
-    "src/file/SDL_rwops.c",
-    "src/haptic/SDL_haptic.c",
+    "src/events/SDL_pen.c",
+
+    "src/file/SDL_iostream.c",
+
+    "src/filesystem/SDL_filesystem.c",
+
+    "src/gpu/SDL_gpu.c",
+
     "src/hidapi/SDL_hidapi.c",
 
-    "src/joystick/SDL_gamecontroller.c",
+    "src/joystick/SDL_gamepad.c",
     "src/joystick/SDL_joystick.c",
     "src/joystick/controller_type.c",
-    "src/joystick/virtual/SDL_virtualjoystick.c",
+    "src/joystick/SDL_steam_virtual_gamepad.c",
+    "src/joystick/hidapi/SDL_hidapi_combined.c",
+    "src/joystick/hidapi/SDL_hidapi_gamecube.c",
+    "src/joystick/hidapi/SDL_hidapi_luna.c",
+    "src/joystick/hidapi/SDL_hidapi_ps3.c",
+    "src/joystick/hidapi/SDL_hidapi_ps4.c",
+    "src/joystick/hidapi/SDL_hidapi_ps5.c",
+    "src/joystick/hidapi/SDL_hidapi_rumble.c",
+    "src/joystick/hidapi/SDL_hidapi_shield.c",
+    "src/joystick/hidapi/SDL_hidapi_stadia.c",
+    "src/joystick/hidapi/SDL_hidapi_steam.c",
+    "src/joystick/hidapi/SDL_hidapi_steamdeck.c",
+    "src/joystick/hidapi/SDL_hidapi_switch.c",
+    "src/joystick/hidapi/SDL_hidapi_wii.c",
+    "src/joystick/hidapi/SDL_hidapi_xbox360.c",
+    "src/joystick/hidapi/SDL_hidapi_xbox360w.c",
+    "src/joystick/hidapi/SDL_hidapi_xboxone.c",
+    "src/joystick/hidapi/SDL_hidapijoystick.c",
 
     "src/libm/e_atan2.c",
     "src/libm/e_exp.c",
@@ -207,16 +240,40 @@ const generic_src_files = [_][]const u8{
     "src/libm/s_cos.c",
     "src/libm/s_fabs.c",
     "src/libm/s_floor.c",
+    "src/libm/s_isinf.c",
+    "src/libm/s_isinff.c",
+    "src/libm/s_isnan.c",
+    "src/libm/s_isnanf.c",
+    "src/libm/s_modf.c",
     "src/libm/s_scalbn.c",
     "src/libm/s_sin.c",
     "src/libm/s_tan.c",
+
     "src/locale/SDL_locale.c",
+
+    "src/main/SDL_main_callbacks.c",
+    "src/main/SDL_runapp.c",
+
     "src/misc/SDL_url.c",
+
     "src/power/SDL_power.c",
+
     "src/render/SDL_d3dmath.c",
     "src/render/SDL_render.c",
     "src/render/SDL_yuv_sw.c",
+    "src/render/opengl/SDL_render_gl.c",
+    "src/render/opengl/SDL_shaders_gl.c",
+    "src/render/software/SDL_blendfillrect.c",
+    "src/render/software/SDL_blendline.c",
+    "src/render/software/SDL_blendpoint.c",
+    "src/render/software/SDL_drawline.c",
+    "src/render/software/SDL_drawpoint.c",
+    "src/render/software/SDL_render_sw.c",
+    "src/render/software/SDL_rotate.c",
+    "src/render/software/SDL_triangle.c",
+
     "src/sensor/SDL_sensor.c",
+
     "src/stdlib/SDL_crc16.c",
     "src/stdlib/SDL_crc32.c",
     "src/stdlib/SDL_getenv.c",
@@ -224,11 +281,20 @@ const generic_src_files = [_][]const u8{
     "src/stdlib/SDL_malloc.c",
     "src/stdlib/SDL_mslibc.c",
     "src/stdlib/SDL_qsort.c",
+    "src/stdlib/SDL_random.c",
     "src/stdlib/SDL_stdlib.c",
     "src/stdlib/SDL_string.c",
     "src/stdlib/SDL_strtokr.c",
+
+    "src/storage/SDL_storage.c",
+    "src/storage/generic/SDL_genericstorage.c",
+
     "src/thread/SDL_thread.c",
+
+    "src/time/SDL_time.c",
+
     "src/timer/SDL_timer.c",
+
     "src/video/SDL_RLEaccel.c",
     "src/video/SDL_blit.c",
     "src/video/SDL_blit_0.c",
@@ -244,36 +310,18 @@ const generic_src_files = [_][]const u8{
     "src/video/SDL_fillrect.c",
     "src/video/SDL_pixels.c",
     "src/video/SDL_rect.c",
-    "src/video/SDL_shape.c",
     "src/video/SDL_stretch.c",
     "src/video/SDL_surface.c",
     "src/video/SDL_video.c",
+    "src/video/SDL_video_unsupported.c",
     "src/video/SDL_vulkan_utils.c",
     "src/video/SDL_yuv.c",
-    "src/video/yuv2rgb/yuv_rgb.c",
-
+    "src/video/yuv2rgb/yuv_rgb_std.c",
+    "src/video/yuv2rgb/yuv_rgb_sse.c",
+    "src/video/yuv2rgb/yuv_rgb_lsx.c",
     "src/video/dummy/SDL_nullevents.c",
     "src/video/dummy/SDL_nullframebuffer.c",
     "src/video/dummy/SDL_nullvideo.c",
-
-    "src/audio/dummy/SDL_dummyaudio.c",
-
-    "src/joystick/hidapi/SDL_hidapi_combined.c",
-    "src/joystick/hidapi/SDL_hidapi_gamecube.c",
-    "src/joystick/hidapi/SDL_hidapi_luna.c",
-    "src/joystick/hidapi/SDL_hidapi_ps3.c",
-    "src/joystick/hidapi/SDL_hidapi_ps4.c",
-    "src/joystick/hidapi/SDL_hidapi_ps5.c",
-    "src/joystick/hidapi/SDL_hidapi_rumble.c",
-    "src/joystick/hidapi/SDL_hidapi_shield.c",
-    "src/joystick/hidapi/SDL_hidapi_stadia.c",
-    "src/joystick/hidapi/SDL_hidapi_steam.c",
-    "src/joystick/hidapi/SDL_hidapi_switch.c",
-    "src/joystick/hidapi/SDL_hidapi_wii.c",
-    "src/joystick/hidapi/SDL_hidapi_xbox360.c",
-    "src/joystick/hidapi/SDL_hidapi_xbox360w.c",
-    "src/joystick/hidapi/SDL_hidapi_xboxone.c",
-    "src/joystick/hidapi/SDL_hidapijoystick.c",
 };
 
 const windows_src_files = [_][]const u8{
@@ -823,7 +871,7 @@ const SdlOption = struct {
     // C Macros are similar to SDL configs but aren't present in the public
     // headers and only affect the SDL implementation.  None of the values
     // should occur in the include directory.
-    c_macros: []const []const u8 = &.{ },
+    c_macros: []const []const u8 = &.{},
     src_files: []const []const u8,
     system_libs: []const []const u8,
 };
@@ -831,8 +879,8 @@ const render_driver_sw = SdlOption{
     .name = "render_driver_software",
     .desc = "enable the software render driver",
     .default = true,
-    .sdl_configs = &.{ },
-    .c_macros = &.{ "SDL_VIDEO_RENDER_SW" },
+    .sdl_configs = &.{},
+    .c_macros = &.{"SDL_VIDEO_RENDER_SW"},
     .src_files = &.{
         "src/render/software/SDL_blendfillrect.c",
         "src/render/software/SDL_blendline.c",
@@ -843,7 +891,7 @@ const render_driver_sw = SdlOption{
         "src/render/software/SDL_rotate.c",
         "src/render/software/SDL_triangle.c",
     },
-    .system_libs = &.{ },
+    .system_libs = &.{},
 };
 const linux_options = [_]SdlOption{
     render_driver_sw,
@@ -855,56 +903,56 @@ const linux_options = [_]SdlOption{
             "SDL_VIDEO_DRIVER_X11",
             "SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS",
         },
-        .src_files = &.{ },
+        .src_files = &.{},
         .system_libs = &.{ "x11", "xext" },
     },
     .{
         .name = "render_driver_ogl",
         .desc = "enable the opengl render driver",
         .default = true,
-        .sdl_configs = &.{ "SDL_VIDEO_RENDER_OGL" },
+        .sdl_configs = &.{"SDL_VIDEO_RENDER_OGL"},
         .src_files = &.{
             "src/render/opengl/SDL_render_gl.c",
             "src/render/opengl/SDL_shaders_gl.c",
         },
-        .system_libs = &.{ },
+        .system_libs = &.{},
     },
     .{
         .name = "render_driver_ogl_es",
         .desc = "enable the opengl es render driver",
         .default = true,
-        .sdl_configs = &.{ "SDL_VIDEO_RENDER_OGL_ES" },
+        .sdl_configs = &.{"SDL_VIDEO_RENDER_OGL_ES"},
         .src_files = &.{
             "src/render/opengles/SDL_render_gles.c",
         },
-        .system_libs = &.{ },
+        .system_libs = &.{},
     },
     .{
         .name = "render_driver_ogl_es2",
         .desc = "enable the opengl es2 render driver",
         .default = true,
-        .sdl_configs = &.{ "SDL_VIDEO_RENDER_OGL_ES2" },
+        .sdl_configs = &.{"SDL_VIDEO_RENDER_OGL_ES2"},
         .src_files = &.{
             "src/render/opengles2/SDL_render_gles2.c",
             "src/render/opengles2/SDL_shaders_gles2.c",
         },
-        .system_libs = &.{ },
+        .system_libs = &.{},
     },
     .{
         .name = "audio_driver_pulse",
         .desc = "enable the pulse audio driver",
         .default = true,
-        .sdl_configs = &.{ "SDL_AUDIO_DRIVER_PULSEAUDIO" },
-        .src_files = &.{ "src/audio/pulseaudio/SDL_pulseaudio.c" },
-        .system_libs = &.{ "pulse" },
+        .sdl_configs = &.{"SDL_AUDIO_DRIVER_PULSEAUDIO"},
+        .src_files = &.{"src/audio/pulseaudio/SDL_pulseaudio.c"},
+        .system_libs = &.{"pulse"},
     },
     .{
         .name = "audio_driver_alsa",
         .desc = "enable the alsa audio driver",
         .default = false,
-        .sdl_configs = &.{ "SDL_AUDIO_DRIVER_ALSA" },
-        .src_files = &.{ "src/audio/alsa/SDL_alsa_audio.c" },
-        .system_libs = &.{ "alsa" },
+        .sdl_configs = &.{"SDL_AUDIO_DRIVER_ALSA"},
+        .src_files = &.{"src/audio/alsa/SDL_alsa_audio.c"},
+        .system_libs = &.{"alsa"},
     },
 };
 

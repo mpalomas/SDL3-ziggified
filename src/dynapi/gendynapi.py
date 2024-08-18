@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #  Simple DirectMedia Layer
-#  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+#  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 #
 #  This software is provided 'as-is', without any express or implied
 #  warranty.  In no event will the authors be held liable for any damages
@@ -25,7 +25,7 @@
 #  It keeps the dynamic API jump table operating correctly.
 #
 #  OS-specific API:
-#   After running the script, you have to manually add #ifdef __WIN32__
+#   After running the script, you have to manually add #ifdef SDL_PLATFORM_WIN32
 #   or similar around the function in 'SDL_dynapi_procs.h'
 #
 
@@ -55,14 +55,14 @@ def main():
     # Get list of SDL headers
     sdl_list_includes = get_header_list()
 
-    reg_externC = re.compile('.*extern[ "]*C[ "].*')
-    reg_comment_remove_content = re.compile('\/\*.*\*/')
-    reg_parsing_function = re.compile('(.*SDLCALL[^\(\)]*) ([a-zA-Z0-9_]+) *\((.*)\) *;.*')
+    reg_externC = re.compile(r'.*extern[ "]*C[ "].*')
+    reg_comment_remove_content = re.compile(r'\/\*.*\*/')
+    reg_parsing_function = re.compile(r'(.*SDLCALL[^\(\)]*) ([a-zA-Z0-9_]+) *\((.*)\) *;.*')
 
     #eg:
     # void (SDLCALL *callback)(void*, int)
     # \1(\2)\3
-    reg_parsing_callback = re.compile('([^\(\)]*)\(([^\(\)]+)\)(.*)')
+    reg_parsing_callback = re.compile(r'([^\(\)]*)\(([^\(\)]+)\)(.*)')
 
     for filename in sdl_list_includes:
         if args.debug:
@@ -75,7 +75,20 @@ def main():
         parsing_comment = False
         current_comment = ""
 
+        ignore_wiki_documentation = False
+
         for line in input:
+
+            # Skip lines if we're in a wiki documentation block.
+            if ignore_wiki_documentation:
+                if line.startswith("#endif"):
+                    ignore_wiki_documentation = False
+                continue
+
+            # Discard wiki documentions blocks.
+            if line.startswith("#ifdef SDL_WIKI_DOCUMENTATION_SECTION"):
+                ignore_wiki_documentation = True
+                continue
 
             # Discard pre-processor directives ^#.*
             if line.startswith("#"):
@@ -87,7 +100,7 @@ def main():
                 continue
 
             # Remove one line comment /* ... */
-            # eg: extern DECLSPEC SDL_hid_device * SDLCALL SDL_hid_open_path(const char *path, int bExclusive /* = false */);
+            # eg: extern SDL_DECLSPEC SDL_hid_device * SDLCALL SDL_hid_open_path(const char *path, int bExclusive /* = false */);
             line = reg_comment_remove_content.sub('', line)
 
             # Get the comment block /* ... */ across several lines
@@ -134,24 +147,39 @@ def main():
             # Discard if it doesn't contain 'SDLCALL'
             if "SDLCALL" not in func:
                 if args.debug:
-                    print("  Discard: " + func)
+                    print("  Discard, doesn't have SDLCALL: " + func)
+                continue
+
+            # Discard if it contains 'SDLMAIN_DECLSPEC' (these are not SDL symbols).
+            if "SDLMAIN_DECLSPEC" in func:
+                if args.debug:
+                    print("  Discard, has SDLMAIN_DECLSPEC: " + func)
                 continue
 
             if args.debug:
                 print("  Raw data: " + func);
 
             # Replace unusual stuff...
-            func = func.replace("SDL_PRINTF_VARARG_FUNC(1)", "");
-            func = func.replace("SDL_PRINTF_VARARG_FUNC(2)", "");
-            func = func.replace("SDL_PRINTF_VARARG_FUNC(3)", "");
-            func = func.replace("SDL_SCANF_VARARG_FUNC(2)", "");
-            func = func.replace("__attribute__((analyzer_noreturn))", "");
-            func = func.replace("SDL_MALLOC", "");
-            func = func.replace("SDL_ALLOC_SIZE2(1, 2)", "");
-            func = func.replace("SDL_ALLOC_SIZE(2)", "");
-            func = re.sub(" SDL_ACQUIRE\(.*\)", "", func);
-            func = re.sub(" SDL_TRY_ACQUIRE\(.*\)", "", func);
-            func = re.sub(" SDL_RELEASE\(.*\)", "", func);
+            func = func.replace(" SDL_PRINTF_VARARG_FUNC(1)", "");
+            func = func.replace(" SDL_PRINTF_VARARG_FUNC(2)", "");
+            func = func.replace(" SDL_PRINTF_VARARG_FUNC(3)", "");
+            func = func.replace(" SDL_PRINTF_VARARG_FUNCV(1)", "");
+            func = func.replace(" SDL_PRINTF_VARARG_FUNCV(2)", "");
+            func = func.replace(" SDL_PRINTF_VARARG_FUNCV(3)", "");
+            func = func.replace(" SDL_WPRINTF_VARARG_FUNC(3)", "");
+            func = func.replace(" SDL_SCANF_VARARG_FUNC(2)", "");
+            func = func.replace(" SDL_SCANF_VARARG_FUNCV(2)", "");
+            func = func.replace(" SDL_ANALYZER_NORETURN", "");
+            func = func.replace(" SDL_MALLOC", "");
+            func = func.replace(" SDL_ALLOC_SIZE2(1, 2)", "");
+            func = func.replace(" SDL_ALLOC_SIZE(2)", "");
+            func = re.sub(r" SDL_ACQUIRE\(.*\)", "", func);
+            func = re.sub(r" SDL_ACQUIRE_SHARED\(.*\)", "", func);
+            func = re.sub(r" SDL_TRY_ACQUIRE\(.*\)", "", func);
+            func = re.sub(r" SDL_TRY_ACQUIRE_SHARED\(.*\)", "", func);
+            func = re.sub(r" SDL_RELEASE\(.*\)", "", func);
+            func = re.sub(r" SDL_RELEASE_SHARED\(.*\)", "", func);
+            func = re.sub(r" SDL_RELEASE_GENERIC\(.*\)", "", func);
 
             # Should be a valid function here
             match = reg_parsing_function.match(func)
@@ -168,8 +196,8 @@ def main():
             #
             func_ret = func_ret.replace('extern', ' ')
             func_ret = func_ret.replace('SDLCALL', ' ')
-            func_ret = func_ret.replace('DECLSPEC', ' ')
-            # Remove trailling spaces in front of '*'
+            func_ret = func_ret.replace('SDL_DECLSPEC', ' ')
+            # Remove trailing spaces in front of '*'
             tmp = ""
             while func_ret != tmp:
                 tmp = func_ret
@@ -235,7 +263,7 @@ def main():
                     if param_name == "":
                         param_name = "param_name_not_specified"
 
-                    # recontruct a callback name for future parsing
+                    # reconstruct a callback name for future parsing
                     func_param_type.append(a + " (" + param_type.strip() + " *REWRITE_NAME)" + c)
                     func_param_name.append(param_name.strip())
 
@@ -261,13 +289,13 @@ def main():
 
                     val = param_type.strip() + "*REWRITE_NAME"
 
-                    # Remove trailling spaces in front of '*'
+                    # Remove trailing spaces in front of '*'
                     tmp = ""
                     while val != tmp:
                         tmp = val
                         val = val.replace('  ', ' ')
                     val = val.replace(' *', '*')
-                    # first occurence
+                    # first occurrence
                     val = val.replace('*', ' *', 1)
                     val = val.strip()
 
@@ -320,83 +348,99 @@ def main():
     # Dump API into a json file
     full_API_json()
 
-    # Check commment formating
+    # Check comment formatting
     check_comment();
 
 # Dump API into a json file
 def full_API_json():
     if args.dump:
         filename = 'sdl.json'
-        with open(filename, 'w') as f:
+        with open(filename, 'w', newline='') as f:
             json.dump(full_API, f, indent=4, sort_keys=True)
             print("dump API to '%s'" % filename);
 
-# Dump API into a json file
+# Check public function comments are correct
+def check_comment_header():
+    if not check_comment_header.done:
+        check_comment_header.done = True
+        print("")
+        print("Please fix following warning(s):")
+        print("-------------------------------")
+
+
 def check_comment():
-    if args.check_comment:
-        print("check comment formating");
 
+    check_comment_header.done = False
 
-        # Check \param
-        for i in full_API:
-            comment = i['comment']
-            name = i['name']
-            retval = i['retval']
-            header = i['header']
+    # Check \param
+    for i in full_API:
+        comment = i['comment']
+        name = i['name']
+        retval = i['retval']
+        header = i['header']
 
-            expected = len(i['parameter'])
-            if expected == 1:
-                if i['parameter'][0] == 'void':
-                    expected = 0;
-            count = comment.count("\\param")
-            if count != expected:
-                # skip SDL_stdinc.h
-                if header != 'SDL_stdinc.h':
-                    # Warning missmatch \param and function prototype
-                    print("%s: %s()  %d '\\param'' but expected %d" % (header, name, count, expected));
-
-
-        # Check \returns
-        for i in full_API:
-            comment = i['comment']
-            name = i['name']
-            retval = i['retval']
-            header = i['header']
-
-            expected = 1
-            if retval == 'void':
+        expected = len(i['parameter'])
+        if expected == 1:
+            if i['parameter'][0] == 'void':
                 expected = 0;
+        count = comment.count("\\param")
+        if count != expected:
+            # skip SDL_stdinc.h
+            if header != 'SDL_stdinc.h':
+                # Warning mismatch \param and function prototype
+                check_comment_header()
+                print("  In file %s: function %s() has %d '\\param' but expected %d" % (header, name, count, expected));
 
-            count = comment.count("\\returns")
-            if count != expected:
-                # skip SDL_stdinc.h
-                if header != 'SDL_stdinc.h':
-                    # Warning missmatch \param and function prototype
-                    print("%s: %s()  %d '\\returns'' but expected %d" % (header, name, count, expected));
-
-        # Check \since
-        for i in full_API:
-            comment = i['comment']
-            name = i['name']
-            retval = i['retval']
-            header = i['header']
-
-            expected = 1
-            count = comment.count("\\since")
-            if count != expected:
-                # skip SDL_stdinc.h
-                if header != 'SDL_stdinc.h':
-                    # Warning missmatch \param and function prototype
-                    print("%s: %s()  %d '\\since'' but expected %d" % (header, name, count, expected));
+        # Warning check \param uses the correct parameter name
+        # skip SDL_stdinc.h
+        if header != 'SDL_stdinc.h':
+            parameter_name = i['parameter_name']
+            for n in parameter_name:
+                if n != "" and "\\param " + n not in comment and "\\param[out] " + n not in comment:
+                    check_comment_header()
+                    print("  In file %s: function %s() missing '\\param %s'" % (header, name, n));
 
 
+    # Check \returns
+    for i in full_API:
+        comment = i['comment']
+        name = i['name']
+        retval = i['retval']
+        header = i['header']
 
+        expected = 1
+        if retval == 'void':
+            expected = 0;
+
+        count = comment.count("\\returns")
+        if count != expected:
+            # skip SDL_stdinc.h
+            if header != 'SDL_stdinc.h':
+                # Warning mismatch \param and function prototype
+                check_comment_header()
+                print("  In file %s: function %s() has %d '\\returns' but expected %d" % (header, name, count, expected));
+
+    # Check \since
+    for i in full_API:
+        comment = i['comment']
+        name = i['name']
+        retval = i['retval']
+        header = i['header']
+
+        expected = 1
+        count = comment.count("\\since")
+        if count != expected:
+            # skip SDL_stdinc.h
+            if header != 'SDL_stdinc.h':
+                # Warning mismatch \param and function prototype
+                check_comment_header()
+                print("  In file %s: function %s() has %d '\\since' but expected %d" % (header, name, count, expected));
 
 
 
 # Parse 'sdl_dynapi_procs_h' file to find existing functions
 def find_existing_procs():
-    reg = re.compile('SDL_DYNAPI_PROC\([^,]*,([^,]*),.*\)')
+    reg = re.compile(r'SDL_DYNAPI_PROC\([^,]*,([^,]*),.*\)')
     ret = []
     input = open(SDL_DYNAPI_PROCS_H)
 
@@ -413,7 +457,7 @@ def find_existing_procs():
 
 # Get list of SDL headers
 def get_header_list():
-    reg = re.compile('^.*\.h$')
+    reg = re.compile(r'^.*\.h$')
     ret = []
     tmp = os.listdir(SDL_INCLUDE_DIR)
 
@@ -438,8 +482,8 @@ def add_dyn_api(proc):
     # File: SDL_dynapi_procs.h
     #
     # Add at last
-    # SDL_DYNAPI_PROC(SDL_EGLConfig,SDL_EGL_GetCurrentEGLConfig,(void),(),return)
-    f = open(SDL_DYNAPI_PROCS_H, "a")
+    # SDL_DYNAPI_PROC(SDL_EGLConfig,SDL_EGL_GetCurrentConfig,(void),(),return)
+    f = open(SDL_DYNAPI_PROCS_H, "a", newline="")
     dyn_proc = "SDL_DYNAPI_PROC(" + func_ret + "," + func_name + ",("
 
     i = ord('a')
@@ -501,7 +545,7 @@ def add_dyn_api(proc):
     #
     # Add at last
     # "#define SDL_DelayNS SDL_DelayNS_REAL
-    f = open(SDL_DYNAPI_OVERRIDES_H, "a")
+    f = open(SDL_DYNAPI_OVERRIDES_H, "a", newline="")
     f.write("#define " + func_name + " " + func_name + "_REAL\n")
     f.close()
 
@@ -515,7 +559,7 @@ def add_dyn_api(proc):
             new_input.append("    " + func_name + ";\n")
         new_input.append(line)
     input.close()
-    f = open(SDL_DYNAPI_SYM, 'w')
+    f = open(SDL_DYNAPI_SYM, 'w', newline='')
     for line in new_input:
         f.write(line)
     f.close()
@@ -525,7 +569,6 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--dump', help='output all SDL API into a .json file', action='store_true')
-    parser.add_argument('--check-comment', help='check comment formating', action='store_true')
     parser.add_argument('--debug', help='add debug traces', action='store_true')
     args = parser.parse_args()
 

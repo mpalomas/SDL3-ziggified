@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,91 +18,102 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "../../SDL_internal.h"
+#include "SDL_internal.h"
 
-#include <sys/stat.h>
-#include <unistd.h>
-
-#if defined(SDL_FILESYSTEM_PS2)
+#ifdef SDL_FILESYSTEM_PS2
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /* System dependent filesystem routines                                */
 
-#include "SDL_error.h"
-#include "SDL_filesystem.h"
+#include "../SDL_sysfilesystem.h"
 
-char *
-SDL_GetBasePath(void)
+#include <sys/stat.h>
+#include <unistd.h>
+
+char *SDL_SYS_GetBasePath(void)
 {
-  char *retval;
-  size_t len;
-  char cwd[FILENAME_MAX];
+    char *retval = NULL;
+    size_t len;
+    char cwd[FILENAME_MAX];
 
-  getcwd(cwd, sizeof(cwd));
-  len = SDL_strlen(cwd) + 1;
-  retval = (char *) SDL_malloc(len);
-  if (retval)
-    SDL_memcpy(retval, cwd, len);
+    getcwd(cwd, sizeof(cwd));
+    len = SDL_strlen(cwd) + 2;
+    retval = (char *)SDL_malloc(len);
+    if (retval) {
+        SDL_snprintf(retval, len, "%s/", cwd);
+    }
 
-  return retval;
+    return retval;
 }
 
 /* Do a recursive mkdir of parents folders */
-static void recursive_mkdir(const char *dir) {
-  char tmp[FILENAME_MAX];
-  char *base = SDL_GetBasePath();
-  char *p = NULL;
-  size_t len;
+static void recursive_mkdir(const char *dir)
+{
+    char tmp[FILENAME_MAX];
+    const char *base = SDL_GetBasePath();
+    char *p = NULL;
+    size_t len;
 
-  snprintf(tmp, sizeof(tmp),"%s",dir);
-  len = strlen(tmp);
-  if (tmp[len - 1] == '/')
-      tmp[len - 1] = 0;
-
-  for (p = tmp + 1; *p; p++) {
-    if (*p == '/') {
-      *p = 0;
-      // Just creating subfolders from current path
-      if (strstr(tmp, base) != NULL)
-        mkdir(tmp, S_IRWXU);
-
-      *p = '/';
+    SDL_snprintf(tmp, sizeof(tmp), "%s", dir);
+    len = SDL_strlen(tmp);
+    if (tmp[len - 1] == '/') {
+        tmp[len - 1] = 0;
     }
-  }
 
-  free(base);
-  mkdir(tmp, S_IRWXU);
+    for (p = tmp + 1; *p; p++) {
+        if (*p == '/') {
+            *p = 0;
+            // Just creating subfolders from current path
+            if (base && SDL_strstr(tmp, base) != NULL) {
+                mkdir(tmp, S_IRWXU);
+            }
+
+            *p = '/';
+        }
+    }
+
+    mkdir(tmp, S_IRWXU);
 }
 
-char *
-SDL_GetPrefPath(const char *org, const char *app)
+char *SDL_SYS_GetPrefPath(const char *org, const char *app)
 {
-  char *retval = NULL;
-  size_t len;
-  char *base = SDL_GetBasePath();
-  if (!app) {
-    SDL_InvalidParamError("app");
+    char *retval = NULL;
+    size_t len;
+
+    if (!app) {
+        SDL_InvalidParamError("app");
+        return NULL;
+    }
+
+    if (!org) {
+        org = "";
+    }
+
+    const char *base = SDL_GetBasePath();
+    if (!base) {
+        return NULL;
+    }
+
+    len = SDL_strlen(base) + SDL_strlen(org) + SDL_strlen(app) + 4;
+    retval = (char *)SDL_malloc(len);
+    if (retval) {
+        if (*org) {
+            SDL_snprintf(retval, len, "%s%s/%s/", base, org, app);
+        } else {
+            SDL_snprintf(retval, len, "%s%s/", base, app);
+        }
+
+        recursive_mkdir(retval);
+    }
+
+    return retval;
+}
+
+/* TODO */
+char *SDL_SYS_GetUserFolder(SDL_Folder folder)
+{
+    SDL_Unsupported();
     return NULL;
-  }
-  if(!org) {
-    org = "";
-  }
-
-  len = SDL_strlen(base) + SDL_strlen(org) + SDL_strlen(app) + 4;
-  retval = (char *) SDL_malloc(len);
-
-  if (*org) {
-    SDL_snprintf(retval, len, "%s%s/%s/", base, org, app);
-  } else {
-    SDL_snprintf(retval, len, "%s%s/", base, app);
-  }
-  free(base);
-
-  recursive_mkdir(retval);
-  
-  return retval;
 }
 
 #endif /* SDL_FILESYSTEM_PS2 */
-
-/* vi: set ts=4 sw=4 expandtab: */

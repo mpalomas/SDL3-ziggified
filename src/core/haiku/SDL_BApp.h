@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -24,7 +24,7 @@
 #include <Path.h>
 #include <InterfaceKit.h>
 #include <LocaleRoster.h>
-#if SDL_VIDEO_OPENGL
+#ifdef SDL_VIDEO_OPENGL
 #include <OpenGLKit.h>
 #endif
 
@@ -46,7 +46,9 @@ extern "C" {
 
 #include <vector>
 
+
 /* Forward declarations */
+class SDL_BLooper;
 class SDL_BWin;
 
 /* Message constants */
@@ -72,29 +74,23 @@ enum ToSDL
     BAPP_SCREEN_CHANGED
 };
 
-/* Create a descendant of BApplication */
-class SDL_BApp : public BApplication
+
+extern "C" SDL_BLooper *SDL_Looper;
+
+
+/* Create a descendant of BLooper */
+class SDL_BLooper : public BLooper
 {
   public:
-    SDL_BApp(const char *signature) : BApplication(signature)
+    SDL_BLooper(const char* name) : BLooper(name)
     {
-#if SDL_VIDEO_OPENGL
+#ifdef SDL_VIDEO_OPENGL
         _current_context = NULL;
 #endif
     }
 
-    virtual ~SDL_BApp()
+    virtual ~SDL_BLooper()
     {
-    }
-
-    virtual void RefsReceived(BMessage *message)
-    {
-        entry_ref entryRef;
-        for (int32 i = 0; message->FindRef("refs", i, &entryRef) == B_OK; i++) {
-            BPath referencePath = BPath(&entryRef);
-            SDL_SendDropFile(NULL, referencePath.Path());
-        }
-        return;
     }
 
     /* Event-handling functions */
@@ -167,7 +163,7 @@ class SDL_BApp : public BApplication
             break;
 
         default:
-            BApplication::MessageReceived(message);
+            BLooper::MessageReceived(message);
             break;
         }
     }
@@ -202,7 +198,7 @@ class SDL_BApp : public BApplication
         return _window_map[winID];
     }
 
-#if SDL_VIDEO_OPENGL
+#ifdef SDL_VIDEO_OPENGL
     BGLView *GetCurrentContext()
     {
         return _current_context;
@@ -253,12 +249,12 @@ class SDL_BApp : public BApplication
             SDL_GetWindowPosition(win, &winPosX, &winPosY);
             int dx = x - (winWidth / 2);
             int dy = y - (winHeight / 2);
-            SDL_SendMouseMotion(0, win, 0, SDL_GetMouse()->relative_mode, (float)dx, (float)dy);
+            SDL_SendMouseMotion(0, win, SDL_DEFAULT_MOUSE_ID, SDL_GetMouse()->relative_mode, (float)dx, (float)dy);
             set_mouse_position((winPosX + winWidth / 2), (winPosY + winHeight / 2));
             if (!be_app->IsCursorHidden())
                 be_app->HideCursor();
         } else {
-            SDL_SendMouseMotion(0, win, 0, 0, (float)x, (float)y);
+            SDL_SendMouseMotion(0, win, SDL_DEFAULT_MOUSE_ID, SDL_FALSE, (float)x, (float)y);
             if (SDL_CursorVisible() && be_app->IsCursorHidden())
                 be_app->ShowCursor();
         }
@@ -276,7 +272,7 @@ class SDL_BApp : public BApplication
             return;
         }
         win = GetSDLWindow(winID);
-        SDL_SendMouseButton(0, win, 0, state, button);
+        SDL_SendMouseButton(0, win, SDL_DEFAULT_MOUSE_ID, state, button);
     }
 
     void _HandleMouseWheel(BMessage *msg)
@@ -291,30 +287,29 @@ class SDL_BApp : public BApplication
             return;
         }
         win = GetSDLWindow(winID);
-        SDL_SendMouseWheel(0, win, 0, xTicks, -yTicks, SDL_MOUSEWHEEL_NORMAL);
+        SDL_SendMouseWheel(0, win, SDL_DEFAULT_MOUSE_ID, xTicks, -yTicks, SDL_MOUSEWHEEL_NORMAL);
     }
 
     void _HandleKey(BMessage *msg)
     {
+        SDL_Window *win;
+        int32 winID;
         int32 scancode, state; /* scancode, pressed/released */
         if (
+            !_GetWinID(msg, &winID) ||
             msg->FindInt32("key-state", &state) != B_OK ||
             msg->FindInt32("key-scancode", &scancode) != B_OK) {
             return;
         }
 
-        /* Make sure this isn't a repeated event (key pressed and held) */
-        if (state == SDL_PRESSED && HAIKU_GetKeyState(scancode) == SDL_PRESSED) {
-            return;
-        }
-        HAIKU_SetKeyState(scancode, state);
-        SDL_SendKeyboardKey(0, state, HAIKU_GetScancodeFromBeKey(scancode));
+        SDL_SendKeyboardKey(0, SDL_DEFAULT_KEYBOARD_ID, scancode, HAIKU_GetScancodeFromBeKey(scancode), state);
 
-        if (state == SDL_PRESSED && SDL_EventEnabled(SDL_EVENT_TEXT_INPUT)) {
+        win = GetSDLWindow(winID);
+        if (state == SDL_PRESSED && SDL_TextInputActive(win)) {
             const int8 *keyUtf8;
             ssize_t count;
             if (msg->FindData("key-utf8", B_INT8_TYPE, (const void **)&keyUtf8, &count) == B_OK) {
-                char text[SDL_TEXTINPUTEVENT_TEXT_SIZE];
+                char text[64];
                 SDL_zeroa(text);
                 SDL_memcpy(text, keyUtf8, count);
                 SDL_SendKeyboardText(text);
@@ -422,7 +417,7 @@ class SDL_BApp : public BApplication
     /* Members */
     std::vector<SDL_Window *> _window_map; /* Keeps track of SDL_Windows by index-id */
 
-#if SDL_VIDEO_OPENGL
+#ifdef SDL_VIDEO_OPENGL
     BGLView *_current_context;
 #endif
 };

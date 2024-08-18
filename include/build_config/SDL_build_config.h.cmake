@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2024 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -22,7 +22,7 @@
 /**
  *  \file SDL_build_config.h
  *
- *  \brief This is a set of defines to configure the SDL features
+ *  This is a set of defines to configure the SDL features
  */
 
 #ifndef SDL_build_config_h_
@@ -30,11 +30,6 @@
 
 /* General platform specific identifiers */
 #include <SDL3/SDL_platform_defines.h>
-
-/* C language features */
-#cmakedefine const @HAVE_CONST@
-#cmakedefine inline @HAVE_INLINE@
-#cmakedefine volatile @HAVE_VOLATILE@
 
 /* C datatypes */
 /* Define SIZEOF_VOIDP for 64/32 architectures */
@@ -47,13 +42,14 @@
 #cmakedefine HAVE_GCC_ATOMICS @HAVE_GCC_ATOMICS@
 #cmakedefine HAVE_GCC_SYNC_LOCK_TEST_AND_SET @HAVE_GCC_SYNC_LOCK_TEST_AND_SET@
 
+#cmakedefine SDL_DISABLE_ALLOCA
+
 /* Comment this if you want to build without any C library requirements */
 #cmakedefine HAVE_LIBC 1
-#if HAVE_LIBC
+#ifdef HAVE_LIBC
 
 /* Useful headers */
 #cmakedefine HAVE_ALLOCA_H 1
-#cmakedefine HAVE_CTYPE_H 1
 #cmakedefine HAVE_FLOAT_H 1
 #cmakedefine HAVE_ICONV_H 1
 #cmakedefine HAVE_INTTYPES_H 1
@@ -71,9 +67,7 @@
 #cmakedefine HAVE_STRING_H 1
 #cmakedefine HAVE_SYS_TYPES_H 1
 #cmakedefine HAVE_WCHAR_H 1
-#cmakedefine HAVE_LINUX_INPUT_H 1
 #cmakedefine HAVE_PTHREAD_NP_H 1
-#cmakedefine HAVE_LIBUNWIND_H 1
 
 /* C library functions */
 #cmakedefine HAVE_DLOPEN 1
@@ -81,15 +75,10 @@
 #cmakedefine HAVE_CALLOC 1
 #cmakedefine HAVE_REALLOC 1
 #cmakedefine HAVE_FREE 1
-#cmakedefine HAVE_ALLOCA 1
-#ifndef __WIN32__ /* Don't use C runtime versions of these on Windows */
 #cmakedefine HAVE_GETENV 1
 #cmakedefine HAVE_SETENV 1
 #cmakedefine HAVE_PUTENV 1
 #cmakedefine HAVE_UNSETENV 1
-#endif
-#cmakedefine HAVE_QSORT 1
-#cmakedefine HAVE_BSEARCH 1
 #cmakedefine HAVE_ABS 1
 #cmakedefine HAVE_BCOPY 1
 #cmakedefine HAVE_MEMSET 1
@@ -97,6 +86,7 @@
 #cmakedefine HAVE_MEMMOVE 1
 #cmakedefine HAVE_MEMCMP 1
 #cmakedefine HAVE_WCSLEN 1
+#cmakedefine HAVE_WCSNLEN 1
 #cmakedefine HAVE_WCSLCPY 1
 #cmakedefine HAVE_WCSLCAT 1
 #cmakedefine HAVE__WCSDUP 1
@@ -104,11 +94,9 @@
 #cmakedefine HAVE_WCSSTR 1
 #cmakedefine HAVE_WCSCMP 1
 #cmakedefine HAVE_WCSNCMP 1
-#cmakedefine HAVE_WCSCASECMP 1
-#cmakedefine HAVE__WCSICMP 1
-#cmakedefine HAVE_WCSNCASECMP 1
-#cmakedefine HAVE__WCSNICMP 1
+#cmakedefine HAVE_WCSTOL 1
 #cmakedefine HAVE_STRLEN 1
+#cmakedefine HAVE_STRNLEN 1
 #cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_STRLCAT 1
 #cmakedefine HAVE__STRREV 1
@@ -119,6 +107,7 @@
 #cmakedefine HAVE_STRCHR 1
 #cmakedefine HAVE_STRRCHR 1
 #cmakedefine HAVE_STRSTR 1
+#cmakedefine HAVE_STRNSTR 1
 #cmakedefine HAVE_STRTOK_R 1
 #cmakedefine HAVE_ITOA 1
 #cmakedefine HAVE__LTOA 1
@@ -135,10 +124,6 @@
 #cmakedefine HAVE_ATOF 1
 #cmakedefine HAVE_STRCMP 1
 #cmakedefine HAVE_STRNCMP 1
-#cmakedefine HAVE__STRICMP 1
-#cmakedefine HAVE_STRCASECMP 1
-#cmakedefine HAVE__STRNICMP 1
-#cmakedefine HAVE_STRNCASECMP 1
 #cmakedefine HAVE_STRCASESTR 1
 #cmakedefine HAVE_SSCANF 1
 #cmakedefine HAVE_VSSCANF 1
@@ -165,6 +150,12 @@
 #cmakedefine HAVE_FLOORF 1
 #cmakedefine HAVE_FMOD 1
 #cmakedefine HAVE_FMODF 1
+#cmakedefine HAVE_ISINF 1
+#cmakedefine HAVE_ISINFF 1
+#cmakedefine HAVE_ISINF_FLOAT_MACRO 1
+#cmakedefine HAVE_ISNAN 1
+#cmakedefine HAVE_ISNANF 1
+#cmakedefine HAVE_ISNAN_FLOAT_MACRO 1
 #cmakedefine HAVE_LOG 1
 #cmakedefine HAVE_LOGF 1
 #cmakedefine HAVE_LOG10 1
@@ -190,16 +181,22 @@
 #cmakedefine HAVE_FOPEN64 1
 #cmakedefine HAVE_FSEEKO 1
 #cmakedefine HAVE_FSEEKO64 1
+#cmakedefine HAVE_MEMFD_CREATE 1
+#cmakedefine HAVE_POSIX_FALLOCATE 1
 #cmakedefine HAVE_SIGACTION 1
 #cmakedefine HAVE_SA_SIGACTION 1
+#cmakedefine HAVE_ST_MTIM 1
 #cmakedefine HAVE_SETJMP 1
 #cmakedefine HAVE_NANOSLEEP 1
+#cmakedefine HAVE_GMTIME_R 1
+#cmakedefine HAVE_LOCALTIME_R 1
+#cmakedefine HAVE_NL_LANGINFO 1
 #cmakedefine HAVE_SYSCONF 1
 #cmakedefine HAVE_SYSCTLBYNAME 1
 #cmakedefine HAVE_CLOCK_GETTIME 1
 #cmakedefine HAVE_GETPAGESIZE 1
-#cmakedefine HAVE_MPROTECT 1
 #cmakedefine HAVE_ICONV 1
+#cmakedefine SDL_USE_LIBICONV 1
 #cmakedefine HAVE_PTHREAD_SETNAME_NP 1
 #cmakedefine HAVE_PTHREAD_SET_NAME_NP 1
 #cmakedefine HAVE_SEM_TIMEDWAIT 1
@@ -215,7 +212,6 @@
 #cmakedefine HAVE_FLOAT_H 1
 #endif /* HAVE_LIBC */
 
-#cmakedefine HAVE_ALTIVEC_H 1
 #cmakedefine HAVE_DBUS_DBUS_H 1
 #cmakedefine HAVE_FCITX 1
 #cmakedefine HAVE_IBUS_IBUS_H 1
@@ -226,31 +222,19 @@
 #cmakedefine HAVE_LIBUSB 1
 #cmakedefine HAVE_O_CLOEXEC 1
 
-/* Apple platforms might be building universal binaries, where Intel builds
-   can use immintrin.h but other architectures can't. */
-#ifdef __APPLE__
-#  if defined(__has_include) && (defined(__i386__) || defined(__x86_64))
-#    if __has_include(<immintrin.h>)
-#       define HAVE_IMMINTRIN_H 1
-#    endif
-#  endif
-#else  /* non-Apple platforms can use the normal CMake check for this. */
-#cmakedefine HAVE_IMMINTRIN_H 1
-#endif
-
+#cmakedefine HAVE_LINUX_INPUT_H 1
 #cmakedefine HAVE_LIBUDEV_H 1
-#cmakedefine HAVE_LIBSAMPLERATE_H 1
-#cmakedefine HAVE_LIBDECOR_H  1
+#cmakedefine HAVE_LIBDECOR_H 1
 
-#cmakedefine HAVE_D3D_H @HAVE_D3D_H@
 #cmakedefine HAVE_D3D11_H @HAVE_D3D11_H@
-#cmakedefine HAVE_D3D12_H @HAVE_D3D12_H@
 #cmakedefine HAVE_DDRAW_H @HAVE_DDRAW_H@
 #cmakedefine HAVE_DSOUND_H @HAVE_DSOUND_H@
 #cmakedefine HAVE_DINPUT_H @HAVE_DINPUT_H@
 #cmakedefine HAVE_XINPUT_H @HAVE_XINPUT_H@
 #cmakedefine HAVE_WINDOWS_GAMING_INPUT_H @HAVE_WINDOWS_GAMING_INPUT_H@
+#cmakedefine HAVE_GAMEINPUT_H @HAVE_GAMEINPUT_H@
 #cmakedefine HAVE_DXGI_H @HAVE_DXGI_H@
+#cmakedefine HAVE_DXGI1_6_H @HAVE_DXGI1_6_H@
 
 #cmakedefine HAVE_MMDEVICEAPI_H @HAVE_MMDEVICEAPI_H@
 #cmakedefine HAVE_AUDIOCLIENT_H @HAVE_AUDIOCLIENT_H@
@@ -259,9 +243,6 @@
 #cmakedefine HAVE_ROAPI_H @HAVE_ROAPI_H@
 #cmakedefine HAVE_SHELLSCALINGAPI_H @HAVE_SHELLSCALINGAPI_H@
 
-#cmakedefine HAVE_XINPUT_GAMEPAD_EX @HAVE_XINPUT_GAMEPAD_EX@
-#cmakedefine HAVE_XINPUT_STATE_EX @HAVE_XINPUT_STATE_EX@
-
 #cmakedefine USE_POSIX_SPAWN @USE_POSIX_SPAWN@
 
 /* SDL internal assertion support */
@@ -269,30 +250,21 @@
 #cmakedefine SDL_DEFAULT_ASSERT_LEVEL @SDL_DEFAULT_ASSERT_LEVEL@
 #endif
 
-/* Allow disabling of core subsystems */
-#cmakedefine SDL_ATOMIC_DISABLED @SDL_ATOMIC_DISABLED@
+/* Allow disabling of major subsystems */
 #cmakedefine SDL_AUDIO_DISABLED @SDL_AUDIO_DISABLED@
-#cmakedefine SDL_CPUINFO_DISABLED @SDL_CPUINFO_DISABLED@
-#cmakedefine SDL_EVENTS_DISABLED @SDL_EVENTS_DISABLED@
-#cmakedefine SDL_FILE_DISABLED @SDL_FILE_DISABLED@
 #cmakedefine SDL_JOYSTICK_DISABLED @SDL_JOYSTICK_DISABLED@
 #cmakedefine SDL_HAPTIC_DISABLED @SDL_HAPTIC_DISABLED@
 #cmakedefine SDL_HIDAPI_DISABLED @SDL_HIDAPI_DISABLED@
 #cmakedefine SDL_SENSOR_DISABLED @SDL_SENSOR_DISABLED@
-#cmakedefine SDL_LOADSO_DISABLED @SDL_LOADSO_DISABLED@
 #cmakedefine SDL_RENDER_DISABLED @SDL_RENDER_DISABLED@
 #cmakedefine SDL_THREADS_DISABLED @SDL_THREADS_DISABLED@
-#cmakedefine SDL_TIMERS_DISABLED @SDL_TIMERS_DISABLED@
 #cmakedefine SDL_VIDEO_DISABLED @SDL_VIDEO_DISABLED@
 #cmakedefine SDL_POWER_DISABLED @SDL_POWER_DISABLED@
-#cmakedefine SDL_FILESYSTEM_DISABLED @SDL_FILESYSTEM_DISABLED@
-#cmakedefine SDL_LOCALE_DISABLED @SDL_LOCALE_DISABLED@
-#cmakedefine SDL_MISC_DISABLED @SDL_MISC_DISABLED@
+#cmakedefine SDL_CAMERA_DISABLED @SDL_CAMERA_DISABLED@
 
 /* Enable various audio drivers */
 #cmakedefine SDL_AUDIO_DRIVER_ALSA @SDL_AUDIO_DRIVER_ALSA@
 #cmakedefine SDL_AUDIO_DRIVER_ALSA_DYNAMIC @SDL_AUDIO_DRIVER_ALSA_DYNAMIC@
-#cmakedefine SDL_AUDIO_DRIVER_ANDROID @SDL_AUDIO_DRIVER_ANDROID@
 #cmakedefine SDL_AUDIO_DRIVER_OPENSLES @SDL_AUDIO_DRIVER_OPENSLES@
 #cmakedefine SDL_AUDIO_DRIVER_AAUDIO @SDL_AUDIO_DRIVER_AAUDIO@
 #cmakedefine SDL_AUDIO_DRIVER_COREAUDIO @SDL_AUDIO_DRIVER_COREAUDIO@
@@ -316,36 +288,37 @@
 #cmakedefine SDL_AUDIO_DRIVER_PSP @SDL_AUDIO_DRIVER_PSP@
 #cmakedefine SDL_AUDIO_DRIVER_PS2 @SDL_AUDIO_DRIVER_PS2@
 #cmakedefine SDL_AUDIO_DRIVER_N3DS @SDL_AUDIO_DRIVER_N3DS@
+#cmakedefine SDL_AUDIO_DRIVER_QNX @SDL_AUDIO_DRIVER_QNX@
 
 /* Enable various input drivers */
 #cmakedefine SDL_INPUT_LINUXEV @SDL_INPUT_LINUXEV@
 #cmakedefine SDL_INPUT_LINUXKD @SDL_INPUT_LINUXKD@
 #cmakedefine SDL_INPUT_FBSDKBIO @SDL_INPUT_FBSDKBIO@
 #cmakedefine SDL_INPUT_WSCONS @SDL_INPUT_WSCONS@
-#cmakedefine SDL_JOYSTICK_ANDROID @SDL_JOYSTICK_ANDROID@
-#cmakedefine SDL_JOYSTICK_HAIKU @SDL_JOYSTICK_HAIKU@
-#cmakedefine SDL_JOYSTICK_WGI @SDL_JOYSTICK_WGI@
-#cmakedefine SDL_JOYSTICK_DINPUT @SDL_JOYSTICK_DINPUT@
-#cmakedefine SDL_JOYSTICK_XINPUT @SDL_JOYSTICK_XINPUT@
-#cmakedefine SDL_JOYSTICK_DUMMY @SDL_JOYSTICK_DUMMY@
-#cmakedefine SDL_JOYSTICK_IOKIT @SDL_JOYSTICK_IOKIT@
-#cmakedefine SDL_JOYSTICK_MFI @SDL_JOYSTICK_MFI@
-#cmakedefine SDL_JOYSTICK_LINUX @SDL_JOYSTICK_LINUX@
-#cmakedefine SDL_JOYSTICK_USBHID @SDL_JOYSTICK_USBHID@
 #cmakedefine SDL_HAVE_MACHINE_JOYSTICK_H @SDL_HAVE_MACHINE_JOYSTICK_H@
-#cmakedefine SDL_JOYSTICK_HIDAPI @SDL_JOYSTICK_HIDAPI@
-#cmakedefine SDL_JOYSTICK_RAWINPUT @SDL_JOYSTICK_RAWINPUT@
+#cmakedefine SDL_JOYSTICK_ANDROID @SDL_JOYSTICK_ANDROID@
+#cmakedefine SDL_JOYSTICK_DINPUT @SDL_JOYSTICK_DINPUT@
+#cmakedefine SDL_JOYSTICK_DUMMY @SDL_JOYSTICK_DUMMY@
 #cmakedefine SDL_JOYSTICK_EMSCRIPTEN @SDL_JOYSTICK_EMSCRIPTEN@
+#cmakedefine SDL_JOYSTICK_GAMEINPUT @SDL_JOYSTICK_GAMEINPUT@
+#cmakedefine SDL_JOYSTICK_HAIKU @SDL_JOYSTICK_HAIKU@
+#cmakedefine SDL_JOYSTICK_HIDAPI @SDL_JOYSTICK_HIDAPI@
+#cmakedefine SDL_JOYSTICK_IOKIT @SDL_JOYSTICK_IOKIT@
+#cmakedefine SDL_JOYSTICK_LINUX @SDL_JOYSTICK_LINUX@
+#cmakedefine SDL_JOYSTICK_MFI @SDL_JOYSTICK_MFI@
+#cmakedefine SDL_JOYSTICK_N3DS @SDL_JOYSTICK_N3DS@
+#cmakedefine SDL_JOYSTICK_PS2 @SDL_JOYSTICK_PS2@
+#cmakedefine SDL_JOYSTICK_PSP @SDL_JOYSTICK_PSP@
+#cmakedefine SDL_JOYSTICK_RAWINPUT @SDL_JOYSTICK_RAWINPUT@
+#cmakedefine SDL_JOYSTICK_USBHID @SDL_JOYSTICK_USBHID@
 #cmakedefine SDL_JOYSTICK_VIRTUAL @SDL_JOYSTICK_VIRTUAL@
 #cmakedefine SDL_JOYSTICK_VITA @SDL_JOYSTICK_VITA@
-#cmakedefine SDL_JOYSTICK_PSP @SDL_JOYSTICK_PSP@
-#cmakedefine SDL_JOYSTICK_PS2 @SDL_JOYSTICK_PS2@
-#cmakedefine SDL_JOYSTICK_N3DS @SDL_JOYSTICK_N3DS@
+#cmakedefine SDL_JOYSTICK_WGI @SDL_JOYSTICK_WGI@
+#cmakedefine SDL_JOYSTICK_XINPUT @SDL_JOYSTICK_XINPUT@
 #cmakedefine SDL_HAPTIC_DUMMY @SDL_HAPTIC_DUMMY@
 #cmakedefine SDL_HAPTIC_LINUX @SDL_HAPTIC_LINUX@
 #cmakedefine SDL_HAPTIC_IOKIT @SDL_HAPTIC_IOKIT@
 #cmakedefine SDL_HAPTIC_DINPUT @SDL_HAPTIC_DINPUT@
-#cmakedefine SDL_HAPTIC_XINPUT @SDL_HAPTIC_XINPUT@
 #cmakedefine SDL_HAPTIC_ANDROID @SDL_HAPTIC_ANDROID@
 #cmakedefine SDL_LIBUSB_DYNAMIC @SDL_LIBUSB_DYNAMIC@
 #cmakedefine SDL_UDEV_DYNAMIC @SDL_UDEV_DYNAMIC@
@@ -366,6 +339,7 @@
 
 /* Enable various threading systems */
 #cmakedefine SDL_THREAD_GENERIC_COND_SUFFIX @SDL_THREAD_GENERIC_COND_SUFFIX@
+#cmakedefine SDL_THREAD_GENERIC_RWLOCK_SUFFIX @SDL_THREAD_GENERIC_RWLOCK_SUFFIX@
 #cmakedefine SDL_THREAD_PTHREAD @SDL_THREAD_PTHREAD@
 #cmakedefine SDL_THREAD_PTHREAD_RECURSIVE_MUTEX @SDL_THREAD_PTHREAD_RECURSIVE_MUTEX@
 #cmakedefine SDL_THREAD_PTHREAD_RECURSIVE_MUTEX_NP @SDL_THREAD_PTHREAD_RECURSIVE_MUTEX_NP@
@@ -374,6 +348,14 @@
 #cmakedefine SDL_THREAD_PSP @SDL_THREAD_PSP@
 #cmakedefine SDL_THREAD_PS2 @SDL_THREAD_PS2@
 #cmakedefine SDL_THREAD_N3DS @SDL_THREAD_N3DS@
+
+/* Enable various RTC systems */
+#cmakedefine SDL_TIME_UNIX @SDL_TIME_UNIX@
+#cmakedefine SDL_TIME_WINDOWS @SDL_TIME_WINDOWS@
+#cmakedefine SDL_TIME_VITA @SDL_TIME_VITA@
+#cmakedefine SDL_TIME_PSP @SDL_TIME_PSP@
+#cmakedefine SDL_TIME_PS2 @SDL_TIME_PS2@
+#cmakedefine SDL_TIME_N3DS @SDL_TIME_N3DS@
 
 /* Enable various timer systems */
 #cmakedefine SDL_TIMER_HAIKU @SDL_TIMER_HAIKU@
@@ -411,7 +393,6 @@
 #cmakedefine SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_EGL @SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_EGL@
 #cmakedefine SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_LIBDECOR @SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_LIBDECOR@
 #cmakedefine SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON @SDL_VIDEO_DRIVER_WAYLAND_DYNAMIC_XKBCOMMON@
-#cmakedefine SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH @SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH@
 #cmakedefine SDL_VIDEO_DRIVER_WINDOWS @SDL_VIDEO_DRIVER_WINDOWS@
 #cmakedefine SDL_VIDEO_DRIVER_WINRT @SDL_VIDEO_DRIVER_WINRT@
 #cmakedefine SDL_VIDEO_DRIVER_X11 @SDL_VIDEO_DRIVER_X11@
@@ -422,7 +403,7 @@
 #cmakedefine SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2 @SDL_VIDEO_DRIVER_X11_DYNAMIC_XINPUT2@
 #cmakedefine SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR @SDL_VIDEO_DRIVER_X11_DYNAMIC_XRANDR@
 #cmakedefine SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS @SDL_VIDEO_DRIVER_X11_DYNAMIC_XSS@
-#cmakedefine SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM @SDL_VIDEO_DRIVER_X11_HAS_XKBKEYCODETOKEYSYM@
+#cmakedefine SDL_VIDEO_DRIVER_X11_HAS_XKBLOOKUPKEYSYM @SDL_VIDEO_DRIVER_X11_HAS_XKBLOOKUPKEYSYM@
 #cmakedefine SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS @SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS@
 #cmakedefine SDL_VIDEO_DRIVER_X11_XCURSOR @SDL_VIDEO_DRIVER_X11_XCURSOR@
 #cmakedefine SDL_VIDEO_DRIVER_X11_XDBE @SDL_VIDEO_DRIVER_X11_XDBE@
@@ -432,67 +413,13 @@
 #cmakedefine SDL_VIDEO_DRIVER_X11_XRANDR @SDL_VIDEO_DRIVER_X11_XRANDR@
 #cmakedefine SDL_VIDEO_DRIVER_X11_XSCRNSAVER @SDL_VIDEO_DRIVER_X11_XSCRNSAVER@
 #cmakedefine SDL_VIDEO_DRIVER_X11_XSHAPE @SDL_VIDEO_DRIVER_X11_XSHAPE@
-
-#ifdef SDL_VIDEO_DRIVER_ANDROID
-#define SDL_ENABLE_SYSWM_ANDROID
-#else
-#define SDL_DISABLE_SYSWM_ANDROID
-#endif
-#ifdef SDL_VIDEO_DRIVER_COCOA
-#define SDL_ENABLE_SYSWM_COCOA
-#else
-#define SDL_DISABLE_SYSWM_COCOA
-#endif
-#ifdef SDL_VIDEO_DRIVER_HAIKU
-#define SDL_ENABLE_SYSWM_HAIKU
-#else
-#define SDL_DISABLE_SYSWM_HAIKU
-#endif
-#ifdef SDL_VIDEO_DRIVER_KMSDRM
-#define SDL_ENABLE_SYSWM_KMSDRM
-#else
-#define SDL_DISABLE_SYSWM_KMSDRM
-#endif
-#ifdef SDL_VIDEO_DRIVER_RISCOS
-#define SDL_ENABLE_SYSWM_RISCOS
-#else
-#define SDL_DISABLE_SYSWM_RISCOS
-#endif
-#ifdef SDL_VIDEO_DRIVER_UIKIT
-#define SDL_ENABLE_SYSWM_UIKIT
-#else
-#define SDL_DISABLE_SYSWM_UIKIT
-#endif
-#ifdef SDL_VIDEO_DRIVER_VIVANTE
-#define SDL_ENABLE_SYSWM_VIVANTE
-#else
-#define SDL_DISABLE_SYSWM_VIVANTE
-#endif
-#ifdef SDL_VIDEO_DRIVER_WAYLAND
-#define SDL_ENABLE_SYSWM_WAYLAND
-#else
-#define SDL_DISABLE_SYSWM_WAYLAND
-#endif
-#ifdef SDL_VIDEO_DRIVER_WINDOWS
-#define SDL_ENABLE_SYSWM_WINDOWS
-#else
-#define SDL_DISABLE_SYSWM_WINDOWS
-#endif
-#ifdef SDL_VIDEO_DRIVER_WINRT
-#define SDL_ENABLE_SYSWM_WINRT
-#else
-#define SDL_DISABLE_SYSWM_WINRT
-#endif
-#ifdef SDL_VIDEO_DRIVER_X11
-#define SDL_ENABLE_SYSWM_X11
-#else
-#define SDL_DISABLE_SYSWM_X11
-#endif
+#cmakedefine SDL_VIDEO_DRIVER_QNX @SDL_VIDEO_DRIVER_QNX@
 
 #cmakedefine SDL_VIDEO_RENDER_D3D @SDL_VIDEO_RENDER_D3D@
 #cmakedefine SDL_VIDEO_RENDER_D3D11 @SDL_VIDEO_RENDER_D3D11@
 #cmakedefine SDL_VIDEO_RENDER_D3D12 @SDL_VIDEO_RENDER_D3D12@
 #cmakedefine SDL_VIDEO_RENDER_METAL @SDL_VIDEO_RENDER_METAL@
+#cmakedefine SDL_VIDEO_RENDER_VULKAN @SDL_VIDEO_RENDER_VULKAN@
 #cmakedefine SDL_VIDEO_RENDER_OGL @SDL_VIDEO_RENDER_OGL@
 #cmakedefine SDL_VIDEO_RENDER_OGL_ES2 @SDL_VIDEO_RENDER_OGL_ES2@
 #cmakedefine SDL_VIDEO_RENDER_PS2 @SDL_VIDEO_RENDER_PS2@
@@ -516,6 +443,12 @@
 
 /* Enable Metal support */
 #cmakedefine SDL_VIDEO_METAL @SDL_VIDEO_METAL@
+
+/* Enable GPU support */
+#cmakedefine SDL_GPU_D3D11 @SDL_GPU_D3D11@
+#cmakedefine SDL_GPU_D3D12 @SDL_GPU_D3D12@
+#cmakedefine SDL_GPU_VULKAN @SDL_GPU_VULKAN@
+#cmakedefine SDL_GPU_METAL @SDL_GPU_METAL@
 
 /* Enable system power support */
 #cmakedefine SDL_POWER_ANDROID @SDL_POWER_ANDROID@
@@ -545,6 +478,26 @@
 #cmakedefine SDL_FILESYSTEM_PS2 @SDL_FILESYSTEM_PS2@
 #cmakedefine SDL_FILESYSTEM_N3DS @SDL_FILESYSTEM_N3DS@
 
+/* Enable system storage support */
+#cmakedefine SDL_STORAGE_GENERIC @SDL_STORAGE_GENERIC@
+#cmakedefine SDL_STORAGE_STEAM @SDL_STORAGE_STEAM@
+
+/* Enable system FSops support */
+#cmakedefine SDL_FSOPS_POSIX @SDL_FSOPS_POSIX@
+#cmakedefine SDL_FSOPS_WINDOWS @SDL_FSOPS_WINDOWS@
+#cmakedefine SDL_FSOPS_DUMMY @SDL_FSOPS_DUMMY@
+
+/* Enable camera subsystem */
+#cmakedefine SDL_CAMERA_DRIVER_DUMMY @SDL_CAMERA_DRIVER_DUMMY@
+/* !!! FIXME: for later cmakedefine SDL_CAMERA_DRIVER_DISK @SDL_CAMERA_DRIVER_DISK@ */
+#cmakedefine SDL_CAMERA_DRIVER_V4L2 @SDL_CAMERA_DRIVER_V4L2@
+#cmakedefine SDL_CAMERA_DRIVER_COREMEDIA @SDL_CAMERA_DRIVER_COREMEDIA@
+#cmakedefine SDL_CAMERA_DRIVER_ANDROID @SDL_CAMERA_DRIVER_ANDROID@
+#cmakedefine SDL_CAMERA_DRIVER_EMSCRIPTEN @SDL_CAMERA_DRIVER_EMSCRIPTEN@
+#cmakedefine SDL_CAMERA_DRIVER_MEDIAFOUNDATION @SDL_CAMERA_DRIVER_MEDIAFOUNDATION@
+#cmakedefine SDL_CAMERA_DRIVER_PIPEWIRE @SDL_CAMERA_DRIVER_PIPEWIRE@
+#cmakedefine SDL_CAMERA_DRIVER_PIPEWIRE_DYNAMIC @SDL_CAMERA_DRIVER_PIPEWIRE_DYNAMIC@
+
 /* Enable misc subsystem */
 #cmakedefine SDL_MISC_DUMMY @SDL_MISC_DUMMY@
 
@@ -557,10 +510,7 @@
 #cmakedefine SDL_ARM_NEON_BLITTERS @SDL_ARM_NEON_BLITTERS@
 
 /* Whether SDL_DYNAMIC_API needs dlopen */
-#cmakedefine DYNAPI_NEEDS_DLOPEN  @DYNAPI_NEEDS_DLOPEN@
-
-/* Enable dynamic libsamplerate support */
-#cmakedefine SDL_LIBSAMPLERATE_DYNAMIC @SDL_LIBSAMPLERATE_DYNAMIC@
+#cmakedefine DYNAPI_NEEDS_DLOPEN @DYNAPI_NEEDS_DLOPEN@
 
 /* Enable ime support */
 #cmakedefine SDL_USE_IME @SDL_USE_IME@
@@ -573,7 +523,10 @@
 #cmakedefine SDL_VIDEO_VITA_PVR @SDL_VIDEO_VITA_PVR@
 #cmakedefine SDL_VIDEO_VITA_PVR_OGL @SDL_VIDEO_VITA_PVR_OGL@
 
-#cmakedefine SDL_HAVE_LIBDECOR_GET_MIN_MAX @SDL_HAVE_LIBDECOR_GET_MIN_MAX@
+/* Libdecor version info */
+#define SDL_LIBDECOR_VERSION_MAJOR @SDL_LIBDECOR_VERSION_MAJOR@
+#define SDL_LIBDECOR_VERSION_MINOR @SDL_LIBDECOR_VERSION_MINOR@
+#define SDL_LIBDECOR_VERSION_PATCH @SDL_LIBDECOR_VERSION_PATCH@
 
 #if !defined(HAVE_STDINT_H) && !defined(_STDINT_H_)
 /* Most everything except Visual Studio 2008 and earlier has stdint.h now */
@@ -596,5 +549,19 @@ typedef unsigned int uintptr_t;
 #endif
 #endif /* Visual Studio 2008 */
 #endif /* !_STDINT_H_ && !HAVE_STDINT_H */
+
+/* Configure use of intrinsics */
+#cmakedefine SDL_DISABLE_SSE 1
+#cmakedefine SDL_DISABLE_SSE2 1
+#cmakedefine SDL_DISABLE_SSE3 1
+#cmakedefine SDL_DISABLE_SSE4_1 1
+#cmakedefine SDL_DISABLE_SSE4_2 1
+#cmakedefine SDL_DISABLE_AVX 1
+#cmakedefine SDL_DISABLE_AVX2 1
+#cmakedefine SDL_DISABLE_AVX512F 1
+#cmakedefine SDL_DISABLE_MMX 1
+#cmakedefine SDL_DISABLE_LSX 1
+#cmakedefine SDL_DISABLE_LASX 1
+#cmakedefine SDL_DISABLE_NEON 1
 
 #endif /* SDL_build_config_h_ */
