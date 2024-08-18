@@ -447,13 +447,12 @@ const linux_src_files = [_][]const u8{
 const darwin_src_files = [_][]const u8{
     "src/haptic/darwin/SDL_syshaptic.c",
     "src/joystick/darwin/SDL_iokitjoystick.c",
-    "src/power/macosx/SDL_syspower.c",
+    "src/power/macos/SDL_syspower.c",
     "src/timer/unix/SDL_systimer.c",
     "src/loadso/dlopen/SDL_sysloadso.c",
     "src/audio/disk/SDL_diskaudio.c",
     "src/render/opengl/SDL_render_gl.c",
     "src/render/opengl/SDL_shaders_gl.c",
-    "src/render/opengles/SDL_render_gles.c",
     "src/render/opengles2/SDL_render_gles2.c",
     "src/render/opengles2/SDL_shaders_gles2.c",
     "src/sensor/dummy/SDL_dummysensor.c",
@@ -467,13 +466,12 @@ const darwin_src_files = [_][]const u8{
 
 const objective_c_src_files = [_][]const u8{
     "src/audio/coreaudio/SDL_coreaudio.m",
-    "src/file/cocoa/SDL_rwopsbundlesupport.m",
     "src/filesystem/cocoa/SDL_sysfilesystem.m",
     //"src/hidapi/testgui/mac_support_cocoa.m",
     // This appears to be for SDL3 only.
     //"src/joystick/apple/SDL_mfijoystick.m",
-    "src/locale/macosx/SDL_syslocale.m",
-    "src/misc/macosx/SDL_sysurl.m",
+    "src/locale/macos/SDL_syslocale.m",
+    "src/misc/macos/SDL_sysurl.m",
     "src/power/uikit/SDL_syspower.m",
     "src/render/metal/SDL_render_metal.m",
     "src/sensor/coremotion/SDL_coremotionsensor.m",
