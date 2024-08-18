@@ -404,7 +404,15 @@ const linux_src_files = [_][]const u8{
 
     "src/misc/unix/SDL_sysurl.c",
 
+    "src/thread/generic/SDL_syscond.c",
+    "src/thread/generic/SDL_sysmutex.c",
+    "src/thread/generic/SDL_sysrwlock.c",
+    "src/thread/generic/SDL_syssem.c",
+    "src/thread/generic/SDL_systhread.c",
+    "src/thread/generic/SDL_systls.c",
+    "src/thread/pthread/SDL_syscond.c",
     "src/thread/pthread/SDL_sysmutex.c",
+    "src/thread/phtread/SDL_sysrwlock.c",
     "src/thread/pthread/SDL_syssem.c",
     "src/thread/pthread/SDL_systhread.c",
     "src/thread/pthread/SDL_systls.c",
