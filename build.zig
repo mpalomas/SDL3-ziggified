@@ -72,7 +72,6 @@ pub fn build(b: *std.Build) void {
     if (use_pregenerated_config) {
         lib.addIncludePath(b.path("include-pregen"));
         lib.installHeadersDirectory(b.path("include-pregen"), "SDL3", .{});
-        lib.addCSourceFiles(.{ .files = render_driver_sw.src_files });
     } else {
         // causes pregenerated SDL_config.h to assert an error
         lib.defineCMacro("USING_GENERATED_CONFIG_H", "");
@@ -422,6 +421,8 @@ const linux_src_files = [_][]const u8{
     "src/video/x11/SDL_x11mouse.c",
     "src/video/x11/SDL_x11opengl.c",
     "src/video/x11/SDL_x11opengles.c",
+    "src/video/x11/SDL_x11pen.c",
+    "src/video/x11/SDL_x11settings.c",
     "src/video/x11/SDL_x11shape.c",
     "src/video/x11/SDL_x11touch.c",
     "src/video/x11/SDL_x11video.c",
@@ -430,6 +431,9 @@ const linux_src_files = [_][]const u8{
     "src/video/x11/SDL_x11xfixes.c",
     "src/video/x11/SDL_x11xinput2.c",
     "src/video/x11/edid-parse.c",
+    "src/video/x11/xsettings-client.c",
+
+    // TODO wayland
 };
 
 const darwin_src_files = [_][]const u8{
