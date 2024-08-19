@@ -331,7 +331,6 @@ const windows_src_files = [_][]const u8{
     "src/filesystem/windows/SDL_sysfilesystem.c",
     "src/haptic/windows/SDL_dinputhaptic.c",
     "src/haptic/windows/SDL_windowshaptic.c",
-    "src/haptic/windows/SDL_xinputhaptic.c",
     "src/hidapi/windows/hid.c",
     "src/joystick/windows/SDL_dinputjoystick.c",
     "src/joystick/windows/SDL_rawinputjoystick.c",
@@ -344,7 +343,7 @@ const windows_src_files = [_][]const u8{
 
     "src/loadso/windows/SDL_sysloadso.c",
     "src/locale/windows/SDL_syslocale.c",
-    "src/main/windows/SDL_windows_main.c",
+    "src/main/windows/SDL_sysmain_runapp.c",
     "src/misc/windows/SDL_sysurl.c",
     "src/power/windows/SDL_syspower.c",
     "src/sensor/windows/SDL_windowssensor.c",
@@ -380,12 +379,10 @@ const windows_src_files = [_][]const u8{
     "src/audio/directsound/SDL_directsound.c",
     "src/audio/wasapi/SDL_wasapi.c",
     "src/audio/wasapi/SDL_wasapi_win32.c",
-    "src/audio/winmm/SDL_winmm.c",
     "src/audio/disk/SDL_diskaudio.c",
 
     "src/render/opengl/SDL_render_gl.c",
     "src/render/opengl/SDL_shaders_gl.c",
-    "src/render/opengles/SDL_render_gles.c",
     "src/render/opengles2/SDL_render_gles2.c",
     "src/render/opengles2/SDL_shaders_gles2.c",
 };
