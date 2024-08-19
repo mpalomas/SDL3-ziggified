@@ -41,6 +41,8 @@ pub fn build(b: *std.Build) void {
             lib.linkFramework("ForceFeedback");
             lib.linkFramework("Carbon");
             lib.linkFramework("CoreAudio");
+            lib.linkFramework("CoreMedia");
+            lib.linkFramework("QuartzCore");
             lib.linkFramework("AudioToolbox");
             lib.linkFramework("AVFoundation");
             lib.linkFramework("Foundation");
@@ -438,7 +440,7 @@ const linux_src_files = [_][]const u8{
     "src/thread/generic/SDL_systls.c",
     "src/thread/pthread/SDL_syscond.c",
     "src/thread/pthread/SDL_sysmutex.c",
-    "src/thread/phtread/SDL_sysrwlock.c",
+    "src/thread/pthread/SDL_sysrwlock.c",
     "src/thread/pthread/SDL_syssem.c",
     "src/thread/pthread/SDL_systhread.c",
     "src/thread/pthread/SDL_systls.c",
@@ -485,6 +487,7 @@ const darwin_src_files = [_][]const u8{
 
     "src/thread/pthread/SDL_syscond.c",
     "src/thread/pthread/SDL_sysmutex.c",
+    "src/thread/pthread/SDL_sysrwlock.c",
     "src/thread/pthread/SDL_syssem.c",
     "src/thread/pthread/SDL_systhread.c",
     "src/thread/pthread/SDL_systls.c",
@@ -492,6 +495,7 @@ const darwin_src_files = [_][]const u8{
 
 const objective_c_src_files = [_][]const u8{
     "src/audio/coreaudio/SDL_coreaudio.m",
+    "src/camera//coremedia/SDL_camera_coremedia.m",
     "src/filesystem/cocoa/SDL_sysfilesystem.m",
     //"src/hidapi/testgui/mac_support_cocoa.m",
     // This appears to be for SDL3 only.
@@ -510,6 +514,7 @@ const objective_c_src_files = [_][]const u8{
     "src/video/cocoa/SDL_cocoamouse.m",
     "src/video/cocoa/SDL_cocoaopengl.m",
     "src/video/cocoa/SDL_cocoaopengles.m",
+    "src/video/cocoa/SDL_cocoapen.m",
     "src/video/cocoa/SDL_cocoashape.m",
     "src/video/cocoa/SDL_cocoavideo.m",
     "src/video/cocoa/SDL_cocoavulkan.m",
