@@ -175,6 +175,9 @@ const generic_src_files = [_][]const u8{
     "src/audio/SDL_wave.c",
     "src/audio/dummy/SDL_dummyaudio.c",
 
+    "src/camera/SDL_camera.c",
+    "src/camera/dummy/SDL_camera_dummy.c",
+
     "src/core/SDL_core_unsupported.c",
 
     "src/cpuinfo/SDL_cpuinfo.c",
@@ -191,12 +194,18 @@ const generic_src_files = [_][]const u8{
     "src/events/SDL_keysym_to_scancode.c",
     "src/events/SDL_mouse.c",
     "src/events/SDL_pen.c",
+    "src/events/SDL_touch.c",
+    "src/events/SDL_quit.c",
+    "src/events/SDL_windowevents.c",
 
     "src/file/SDL_iostream.c",
 
     "src/filesystem/SDL_filesystem.c",
 
     "src/gpu/SDL_gpu.c",
+
+    "src/haptic/SDL_haptic.c",
+    "src/haptic/dummy/SDL_syshaptic.c",
 
     "src/hidapi/SDL_hidapi.c",
 
@@ -221,6 +230,7 @@ const generic_src_files = [_][]const u8{
     "src/joystick/hidapi/SDL_hidapi_xbox360w.c",
     "src/joystick/hidapi/SDL_hidapi_xboxone.c",
     "src/joystick/hidapi/SDL_hidapijoystick.c",
+    "src/joystick/virtual/SDL_virtualjoystick.c",
 
     "src/libm/e_atan2.c",
     "src/libm/e_exp.c",
@@ -270,6 +280,8 @@ const generic_src_files = [_][]const u8{
     "src/render/software/SDL_render_sw.c",
     "src/render/software/SDL_rotate.c",
     "src/render/software/SDL_triangle.c",
+    "src/render/vulkan/SDL_render_vulkan.c",
+    "src/render/vulkan/SDL_shaders_vulkan.c",
 
     "src/sensor/SDL_sensor.c",
 
@@ -278,6 +290,9 @@ const generic_src_files = [_][]const u8{
     "src/stdlib/SDL_getenv.c",
     "src/stdlib/SDL_iconv.c",
     "src/stdlib/SDL_malloc.c",
+    "src/stdlib/SDL_memcpy.c",
+    "src/stdlib/SDL_memmove.c",
+    "src/stdlib/SDL_memset.c",
     "src/stdlib/SDL_mslibc.c",
     "src/stdlib/SDL_qsort.c",
     "src/stdlib/SDL_random.c",
@@ -321,14 +336,22 @@ const generic_src_files = [_][]const u8{
     "src/video/dummy/SDL_nullevents.c",
     "src/video/dummy/SDL_nullframebuffer.c",
     "src/video/dummy/SDL_nullvideo.c",
+    "src/video/offscreen/SDL_offscreenevents.c",
+    "src/video/offscreen/SDL_offscreenframebuffer.c",
+    "src/video/offscreen/SDL_offscreenopengles.c",
+    "src/video/offscreen/SDL_offscreenvideo.c",
+    "src/video/offscreen/SDL_offscreenvulkan.c",
+    "src/video/offscreen/SDL_offscreenwindow.c",
 };
 
 const windows_src_files = [_][]const u8{
+    "src/camera/mediafoundation/SDL_camera_mediafoundation.c",
     "src/core/windows/SDL_hid.c",
     "src/core/windows/SDL_immdevice.c",
     "src/core/windows/SDL_windows.c",
     "src/core/windows/SDL_xinput.c",
     "src/filesystem/windows/SDL_sysfilesystem.c",
+    "src/filesystem/windows/SDL_sysfsops.c",
     "src/haptic/windows/SDL_dinputhaptic.c",
     "src/haptic/windows/SDL_windowshaptic.c",
     "src/hidapi/windows/hid.c",
@@ -337,7 +360,7 @@ const windows_src_files = [_][]const u8{
     // This can be enabled when Zig updates to the next mingw-w64 release,
     // which will make the headers gain `windows.gaming.input.h`.
     // Also revert the patch 2c79fd8fd04f1e5045cbe5978943b0aea7593110.
-    //"src/joystick/windows/SDL_windows_gaming_input.c",
+    "src/joystick/windows/SDL_windows_gaming_input.c",
     "src/joystick/windows/SDL_windowsjoystick.c",
     "src/joystick/windows/SDL_xinputjoystick.c",
 
@@ -351,12 +374,14 @@ const windows_src_files = [_][]const u8{
     "src/video/windows/SDL_windowsclipboard.c",
     "src/video/windows/SDL_windowsevents.c",
     "src/video/windows/SDL_windowsframebuffer.c",
+    "src/video/windows/SDL_windowsgameinput.c",
     "src/video/windows/SDL_windowskeyboard.c",
     "src/video/windows/SDL_windowsmessagebox.c",
     "src/video/windows/SDL_windowsmodes.c",
     "src/video/windows/SDL_windowsmouse.c",
     "src/video/windows/SDL_windowsopengl.c",
     "src/video/windows/SDL_windowsopengles.c",
+    "src/video/windows/SDL_windowsrawinput.c",
     "src/video/windows/SDL_windowsshape.c",
     "src/video/windows/SDL_windowsvideo.c",
     "src/video/windows/SDL_windowsvulkan.c",
@@ -364,10 +389,14 @@ const windows_src_files = [_][]const u8{
 
     "src/thread/windows/SDL_syscond_cv.c",
     "src/thread/windows/SDL_sysmutex.c",
+    "src/thread/windows/SDL_sysrwlock_srw.c",
     "src/thread/windows/SDL_syssem.c",
     "src/thread/windows/SDL_systhread.c",
     "src/thread/windows/SDL_systls.c",
     "src/thread/generic/SDL_syscond.c",
+    "src/thread/generic/SDL_sysrwlock.c",
+
+    "src/time//windows//SDL_systime.c",
 
     "src/render/direct3d/SDL_render_d3d.c",
     "src/render/direct3d/SDL_shaders_d3d.c",
