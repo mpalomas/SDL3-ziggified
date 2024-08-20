@@ -36,9 +36,11 @@ pub fn build(b: *std.Build) void {
             lib.linkFramework("OpenGL");
             lib.linkFramework("Metal");
             lib.linkFramework("CoreVideo");
+            lib.linkFramework("CoreHaptics");
             lib.linkFramework("Cocoa");
             lib.linkFramework("IOKit");
             lib.linkFramework("ForceFeedback");
+            lib.linkFramework("GameController");
             lib.linkFramework("Carbon");
             lib.linkFramework("CoreAudio");
             lib.linkFramework("CoreMedia");
@@ -423,6 +425,7 @@ const linux_src_files = [_][]const u8{
     "src/core/unix/SDL_poll.c",
 
     "src/filesystem/unix/SDL_sysfilesystem.c",
+    "src/filesystem/posix/SDL_sysfsops.c",
 
     "src/haptic/linux/SDL_syshaptic.c",
 
@@ -479,6 +482,7 @@ const darwin_src_files = [_][]const u8{
     "src/timer/unix/SDL_systimer.c",
     "src/loadso/dlopen/SDL_sysloadso.c",
     "src/audio/disk/SDL_diskaudio.c",
+    "src/filesystem/posix/SDL_sysfsops.c",
     "src/render/opengl/SDL_render_gl.c",
     "src/render/opengl/SDL_shaders_gl.c",
     "src/render/opengles2/SDL_render_gles2.c",
@@ -495,11 +499,11 @@ const darwin_src_files = [_][]const u8{
 
 const objective_c_src_files = [_][]const u8{
     "src/audio/coreaudio/SDL_coreaudio.m",
-    "src/camera//coremedia/SDL_camera_coremedia.m",
+    "src/camera/coremedia/SDL_camera_coremedia.m",
     "src/filesystem/cocoa/SDL_sysfilesystem.m",
     //"src/hidapi/testgui/mac_support_cocoa.m",
     // This appears to be for SDL3 only.
-    //"src/joystick/apple/SDL_mfijoystick.m",
+    "src/joystick/apple/SDL_mfijoystick.m",
     "src/locale/macos/SDL_syslocale.m",
     "src/misc/macos/SDL_sysurl.m",
     "src/power/uikit/SDL_syspower.m",
