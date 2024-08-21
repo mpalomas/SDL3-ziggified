@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "sdl_build_config_minimal.h": "c",
-        "sdl_dbus.h": "c"
+        "sdl_dbus.h": "c",
+        "sdl_build_config.h": "c",
+        "sdl_build_config_linux_ubuntu.h": "c"
     }
 }

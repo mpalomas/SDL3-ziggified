@@ -49,27 +49,13 @@ pub fn build(b: *std.Build) void {
             lib.linkFramework("AVFoundation");
             lib.linkFramework("Foundation");
         },
-        .emscripten => {
-            lib.defineCMacro("__EMSCRIPTEN_PTHREADS__ ", "1");
-            lib.defineCMacro("USE_SDL", "2");
-            lib.addCSourceFiles(.{ .files = &emscripten_src_files });
-            if (b.sysroot == null) {
-                @panic("Pass '--sysroot \"$EMSDK/upstream/emscripten\"'");
-            }
-
-            const cache_include = std.fs.path.join(b.allocator, &.{ b.sysroot.?, "cache", "sysroot", "include" }) catch @panic("Out of memory");
-            defer b.allocator.free(cache_include);
-
-            var dir = std.fs.openDirAbsolute(cache_include, std.fs.Dir.OpenDirOptions{ .access_sub_paths = true, .no_follow = true }) catch @panic("No emscripten cache. Generate it!");
-            dir.close();
-
-            lib.addIncludePath(b.path(cache_include));
-        },
         else => {},
     }
 
     const use_pregenerated_config = switch (t.os.tag) {
-        .windows, .macos, .linux, .emscripten => true,
+        .windows,
+        .macos,
+        => true,
         else => false,
     };
 
@@ -84,7 +70,7 @@ pub fn build(b: *std.Build) void {
         defer files.deinit();
 
         const config_header = b.addConfigHeader(.{
-            .style = .{ .cmake = b.path("include/SDL_config.h.cmake") },
+            .style = .{ .cmake = b.path("include/SDL_build_config.h.cmake") },
             .include_path = "SDL_config.h",
         }, .{
             .HAVE_CONST = 1,
@@ -112,6 +98,112 @@ pub fn build(b: *std.Build) void {
             .HAVE_LIBC = 1,
             .STDC_HEADERS = 1,
             .SDL_DEFAULT_ASSERT_LEVEL_CONFIGURED = 0,
+            .HAVE_GCC_ATOMICS = 1,
+            .HAVE_GCC_SYNC_LOCK_TEST_AND_SET = 0,
+            .HAVE_D3D11_H = 0,
+            .HAVE_DDRAW_H = 0,
+            .HAVE_DSOUND_H = 0,
+            .HAVE_DINPUT_H = 0,
+            .HAVE_XINPUT_H = 0,
+            .HAVE_WINDOWS_GAMING_INPUT_H = 0,
+            .HAVE_GAMEINPUT_H = 0,
+            .HAVE_DXGI_H = 0,
+            .HAVE_DXGI1_6_H = 0,
+            .HAVE_MMDEVICEAPI_H = 0,
+            .HAVE_AUDIOCLIENT_H = 0,
+            .HAVE_TPCSHRD_H = 0,
+            .HAVE_SENSORSAPI_H = 0,
+            .HAVE_ROAPI_H = 0,
+            .HAVE_SHELLSCALINGAPI_H = 0,
+            .USE_POSIX_SPAWN = 0,
+            .SDL_DEFAULT_ASSERT_LEVEL = 0,
+            .SDL_AUDIO_DISABLED = 1,
+            .SDL_JOYSTICK_DISABLED = 0,
+            .SDL_HAPTIC_DISABLED = 1,
+            .SDL_HIDAPI_DISABLED = 0,
+            .SDL_SENSOR_DISABLED = 1,
+            .SDL_RENDER_DISABLED = 0,
+            .SDL_THREADS_DISABLED = 0,
+            .SDL_VIDEO_DISABLED = 0,
+            .SDL_POWER_DISABLED = 0,
+            .SDL_CAMERA_DISABLED = 1,
+            .SDL_AUDIO_DRIVER_ALSA = 0,
+            .SDL_AUDIO_DRIVER_ALSA_DYNAMIC = "libasound.so.2",
+            .SDL_AUDIO_DRIVER_OPENSLES = 0,
+            .SDL_AUDIO_DRIVER_AAUDIO = 0,
+            .SDL_AUDIO_DRIVER_COREAUDIO = 0,
+            .SDL_AUDIO_DRIVER_DISK = 1,
+            .SDL_AUDIO_DRIVER_DSOUND = 0,
+            .SDL_AUDIO_DRIVER_DUMMY = 1,
+            .SDL_AUDIO_DRIVER_EMSCRIPTEN = 0,
+            .SDL_AUDIO_DRIVER_HAIKU = 0,
+            .SDL_AUDIO_DRIVER_JACK = 0,
+            .SDL_AUDIO_DRIVER_JACK_DYNAMIC = "libjack.so.0",
+            .SDL_AUDIO_DRIVER_NETBSD = 0,
+            .SDL_AUDIO_DRIVER_OSS = 0,
+            .SDL_AUDIO_DRIVER_PIPEWIRE = 0,
+            .SDL_AUDIO_DRIVER_PIPEWIRE_DYNAMIC = 0,
+            .SDL_AUDIO_DRIVER_PULSEAUDIO = 0,
+            .SDL_AUDIO_DRIVER_PULSEAUDIO_DYNAMIC = "libpulse.so.0",
+            .SDL_AUDIO_DRIVER_SNDIO = 0,
+            .SDL_AUDIO_DRIVER_SNDIO_DYNAMIC = "libsndio.so.7",
+            .SDL_AUDIO_DRIVER_WASAPI = 0,
+            .SDL_AUDIO_DRIVER_VITA = 0,
+            .SDL_AUDIO_DRIVER_PSP = 0,
+            .SDL_AUDIO_DRIVER_PS2 = 0,
+            .SDL_AUDIO_DRIVER_N3DS = 0,
+            .SDL_AUDIO_DRIVER_QNX = 0,
+            .SDL_INPUT_LINUXEV = 1,
+            .SDL_INPUT_LINUXKD = 1,
+            .SDL_INPUT_FBSDKBIO = 0,
+            .SDL_INPUT_WSCONS = 0,
+            .SDL_HAVE_MACHINE_JOYSTICK_H = 0,
+            .SDL_JOYSTICK_ANDROID = 0,
+            .SDL_JOYSTICK_DINPUT = 0,
+            .SDL_JOYSTICK_DUMMY = 0,
+            .SDL_JOYSTICK_EMSCRIPTEN = 0,
+            .SDL_JOYSTICK_GAMEINPUT = 0,
+            .SDL_JOYSTICK_HAIKU = 0,
+            .SDL_JOYSTICK_HIDAPI = 1,
+            .SDL_JOYSTICK_IOKIT = 0,
+            .SDL_JOYSTICK_LINUX = 1,
+            .SDL_JOYSTICK_MFI = 0,
+            .SDL_JOYSTICK_N3DS = 0,
+            .SDL_JOYSTICK_PS2 = 0,
+            .SDL_JOYSTICK_PSP = 0,
+            .SDL_JOYSTICK_RAWINPUT = 0,
+            .SDL_JOYSTICK_USBHID = 0,
+            .SDL_JOYSTICK_VIRTUAL = 1,
+            .SDL_JOYSTICK_VITA = 0,
+            .SDL_JOYSTICK_WGI = 0,
+            .SDL_JOYSTICK_XINPUT = 0,
+            .SDL_HAPTIC_DUMMY = 1,
+            .SDL_HAPTIC_LINUX = 0,
+            .SDL_HAPTIC_IOKIT = 0,
+            .SDL_HAPTIC_DINPUT = 0,
+            .SDL_HAPTIC_ANDROID = 0,
+            .SDL_LIBUSB_DYNAMIC = 0,
+            .SDL_UDEV_DYNAMIC = "libudev.so.1",
+            .SDL_SENSOR_ANDROID = 0,
+            .SDL_SENSOR_COREMOTION = 0,
+            .SDL_SENSOR_WINDOWS = 0,
+            .SDL_SENSOR_DUMMY = 1,
+            .SDL_SENSOR_VITA = 0,
+            .SDL_SENSOR_N3DS = 0,
+            .SDL_LOADSO_DLOPEN = 1,
+            .SDL_LOADSO_DUMMY = 0,
+            .SDL_LOADSO_LDG = 0,
+            .SDL_LOADSO_WINDOWS = 0,
+            .SDL_THREAD_GENERIC_COND_SUFFIX = 0,
+            .SDL_THREAD_GENERIC_RWLOCK_SUFFIX = 0,
+            .SDL_THREAD_PTHREAD = 1,
+            .SDL_THREAD_PTHREAD_RECURSIVE_MUTEX = 1,
+            .SDL_THREAD_PTHREAD_RECURSIVE_MUTEX_NP = 0,
+            .SDL_THREAD_WINDOWS = 0,
+            .SDL_THREAD_VITA = 0,
+            .SDL_THREAD_PSP = 0,
+            .SDL_THREAD_PS2 = 0,
+            .SDL_THREAD_N3DS = 0,
         });
         switch (t.os.tag) {
             .linux => {
@@ -146,7 +238,7 @@ pub fn build(b: *std.Build) void {
         const revision_header = b.addConfigHeader(.{
             .style = .{ .cmake = b.path("include/SDL_revision.h.cmake") },
             .include_path = "SDL_revision.h",
-        }, .{});
+        }, .{ .SDL_REVISION = "gpu-head", .SDL_VENDOR_INFO = "" });
         lib.addConfigHeader(revision_header);
         lib.installConfigHeader(revision_header);
     }
@@ -421,13 +513,18 @@ const windows_src_files = [_][]const u8{
 };
 
 const linux_src_files = [_][]const u8{
+    "src/audio/alsa/SDL_alsa_audio.c",
+    "src/audio/sndio/SDL_sndioaudio.c",
+    "src/audio/disk/SDL_diskaudio.c",
+    "src/audio/jack/SDL_jackaudio.c",
+
     "src/core/linux/SDL_threadprio.c",
     "src/core/unix/SDL_poll.c",
 
     "src/filesystem/unix/SDL_sysfilesystem.c",
     "src/filesystem/posix/SDL_sysfsops.c",
 
-    "src/haptic/linux/SDL_syshaptic.c",
+    // "src/haptic/linux/SDL_syshaptic.c",
 
     "src/loadso/dlopen/SDL_sysloadso.c",
     "src/joystick/linux/SDL_sysjoystick.c",
@@ -968,7 +1065,7 @@ const linux_options = [_]SdlOption{
     .{
         .name = "audio_driver_pulse",
         .desc = "enable the pulse audio driver",
-        .default = true,
+        .default = false,
         .sdl_configs = &.{"SDL_AUDIO_DRIVER_PULSEAUDIO"},
         .src_files = &.{"src/audio/pulseaudio/SDL_pulseaudio.c"},
         .system_libs = &.{"pulse"},

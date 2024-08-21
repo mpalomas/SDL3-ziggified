@@ -262,6 +262,10 @@
 /* #undef SDL_VIDEO_DISABLED */
 /* #undef SDL_POWER_DISABLED */
 /* #undef SDL_CAMERA_DISABLED */
+#define SDL_HAPTIC_DISABLED
+#define SDL_CAMERA_DISABLED
+#define SDL_AUDIO_DISABLED
+#define SDL_SENSOR_DISABLED
 
 /* Enable various audio drivers */
 #define SDL_AUDIO_DRIVER_ALSA 1
@@ -317,7 +321,7 @@
 /* #undef SDL_JOYSTICK_WGI */
 /* #undef SDL_JOYSTICK_XINPUT */
 /* #undef SDL_HAPTIC_DUMMY */
-#define SDL_HAPTIC_LINUX 1
+#define SDL_HAPTIC_LINUX 0
 /* #undef SDL_HAPTIC_IOKIT */
 /* #undef SDL_HAPTIC_DINPUT */
 /* #undef SDL_HAPTIC_ANDROID */
