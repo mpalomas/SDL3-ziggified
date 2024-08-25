@@ -49,6 +49,7 @@ pub fn build(b: *std.Build) void {
             lib.linkFramework("AVFoundation");
             lib.linkFramework("Foundation");
         },
+        .linux => {},
         else => {},
     }
 
@@ -383,6 +384,7 @@ const generic_src_files = [_][]const u8{
     "src/render/vulkan/SDL_shaders_vulkan.c",
 
     "src/sensor/SDL_sensor.c",
+    "src/sensor/dummy/SDL_dummysensor.c",
 
     "src/stdlib/SDL_crc16.c",
     "src/stdlib/SDL_crc32.c",
@@ -527,6 +529,10 @@ const linux_src_files = [_][]const u8{
 
     "src/core/linux/SDL_threadprio.c",
     "src/core/unix/SDL_poll.c",
+    "src/core/unix/SDL_appid.c",
+
+    "src/events/imKStoUCS.c",
+    "src/events/SDL_scancode_tables.c",
 
     "src/filesystem/unix/SDL_sysfilesystem.c",
     "src/filesystem/posix/SDL_sysfsops.c",
@@ -536,6 +542,8 @@ const linux_src_files = [_][]const u8{
     "src/loadso/dlopen/SDL_sysloadso.c",
     "src/joystick/linux/SDL_sysjoystick.c",
     "src/joystick/dummy/SDL_sysjoystick.c",
+
+    "src/locale/unix/SDL_syslocale.c",
 
     "src/misc/unix/SDL_sysurl.c",
 
@@ -552,6 +560,7 @@ const linux_src_files = [_][]const u8{
     "src/thread/pthread/SDL_systhread.c",
     "src/thread/pthread/SDL_systls.c",
 
+    "src/time//unix/SDL_systime.c",
     "src/timer/unix/SDL_systimer.c",
 
     "src/video/x11/SDL_x11clipboard.c",
@@ -1035,7 +1044,7 @@ const linux_options = [_]SdlOption{
             "SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS",
         },
         .src_files = &.{},
-        .system_libs = &.{ "x11", "xext" },
+        .system_libs = &.{ "X11", "Xext", "Xfixes", "Xcursor", "Xrandr", "Xi", "Xss" },
     },
     .{
         .name = "render_driver_ogl",
