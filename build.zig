@@ -522,10 +522,10 @@ const windows_src_files = [_][]const u8{
 };
 
 const linux_src_files = [_][]const u8{
-    "src/audio/alsa/SDL_alsa_audio.c",
-    "src/audio/sndio/SDL_sndioaudio.c",
-    "src/audio/disk/SDL_diskaudio.c",
-    "src/audio/jack/SDL_jackaudio.c",
+    // "src/audio/alsa/SDL_alsa_audio.c",
+    // "src/audio/sndio/SDL_sndioaudio.c",
+    // "src/audio/disk/SDL_diskaudio.c",
+    // "src/audio/jack/SDL_jackaudio.c",
 
     "src/core/linux/SDL_threadprio.c",
     "src/core/unix/SDL_poll.c",

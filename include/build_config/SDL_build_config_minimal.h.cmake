@@ -231,6 +231,18 @@ typedef unsigned int uintptr_t;
 #define HAVE_FLOAT_H 1
 #endif /* HAVE_LIBC */
 
+/* Allow disabling of major subsystems */
+#undef SDL_AUDIO_DISABLED
+/* #undef SDL_JOYSTICK_DISABLED */
+#undef SDL_HAPTIC_DISABLED
+/* #undef SDL_HIDAPI_DISABLED */
+#undef SDL_SENSOR_DISABLED
+/* #undef SDL_RENDER_DISABLED */
+/* #undef SDL_THREADS_DISABLED */
+/* #undef SDL_VIDEO_DISABLED */
+/* #undef SDL_POWER_DISABLED */
+#undef SDL_CAMERA_DISABLED
+
 
 #define SDL_JOYSTICK_HIDAPI 1
 
