@@ -531,11 +531,17 @@ const linux_src_files = [_][]const u8{
     "src/core/unix/SDL_poll.c",
     "src/core/unix/SDL_appid.c",
 
+    "src/dialog/unix/SDL_unixdialog.c",
+    "src/dialog/unix/SDL_zenitydialog.c",
+    "src/dialog/unix/SDL_portaldialog.c",
+
     "src/events/imKStoUCS.c",
     "src/events/SDL_scancode_tables.c",
 
     "src/filesystem/unix/SDL_sysfilesystem.c",
     "src/filesystem/posix/SDL_sysfsops.c",
+
+    "src/gpu/vulkan/SDL_gpu_vulkan.c",
 
     // "src/haptic/linux/SDL_syshaptic.c",
 

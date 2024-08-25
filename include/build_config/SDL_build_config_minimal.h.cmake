@@ -269,8 +269,8 @@ typedef unsigned int uintptr_t;
 #define SDL_VIDEO_DRIVER_DUMMY  1
 
 /* Enable the dummy filesystem driver (src/filesystem/dummy/\*.c) */
-#define SDL_FILESYSTEM_DUMMY  1
-#define SDL_FSOPS_DUMMY 1
+#undef SDL_FILESYSTEM_DUMMY
+#undef SDL_FSOPS_DUMMY 0
 
 /* Enable the camera driver (src/camera/dummy/\*.c) */
 #define SDL_CAMERA_DRIVER_DUMMY  1
@@ -300,5 +300,16 @@ typedef unsigned int uintptr_t;
 
 #define SDL_VIDEO_VULKAN 1
 #define SDL_GPU_VULKAN 1
+
+#undef SDL_POWER_LINUX
+#define SDL_FILESYSTEM_UNIX 1
+
+#define SDL_FSOPS_POSIX 1
+
+#define DYNAPI_NEEDS_DLOPEN 1
+
+#define SDL_DISABLE_LSX 1
+#define SDL_DISABLE_LASX 1
+#define SDL_DISABLE_NEON 1
 
 #endif /* SDL_build_config_minimal_h_ */
