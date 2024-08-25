@@ -279,6 +279,7 @@ const generic_src_files = [_][]const u8{
 
     "src/cpuinfo/SDL_cpuinfo.c",
 
+    "src/dialog/SDL_dialog_utils.c",
     "src/dynapi/SDL_dynapi.c",
 
     "src/events/SDL_categories.c",
@@ -358,6 +359,7 @@ const generic_src_files = [_][]const u8{
     "src/locale/SDL_locale.c",
 
     "src/main/SDL_main_callbacks.c",
+    "src/main/generic/SDL_sysmain_callbacks.c",
     "src/main/SDL_runapp.c",
 
     "src/misc/SDL_url.c",
@@ -447,8 +449,12 @@ const windows_src_files = [_][]const u8{
     "src/core/windows/SDL_immdevice.c",
     "src/core/windows/SDL_windows.c",
     "src/core/windows/SDL_xinput.c",
+    "src/dialog/windows/SDL_windowsdialog.c",
     "src/filesystem/windows/SDL_sysfilesystem.c",
     "src/filesystem/windows/SDL_sysfsops.c",
+    "src/gpu/vulkan/SDL_gpu_vulkan.c",
+    "src/gpu/d3d11/SDL_gpu_d3d11.c",
+    "src/gpu/d3d12/SDL_gpu_d3d12.c",
     "src/haptic/windows/SDL_dinputhaptic.c",
     "src/haptic/windows/SDL_windowshaptic.c",
     "src/hidapi/windows/hid.c",
