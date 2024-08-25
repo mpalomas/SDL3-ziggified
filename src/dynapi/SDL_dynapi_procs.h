@@ -28,7 +28,7 @@
    Also, this file gets included multiple times, don't add #pragma once, etc.
 */
 
-/* direct jump magic can use these, the rest needs special code. */
+// direct jump magic can use these, the rest needs special code.
 #ifndef SDL_DYNAPI_PROC_NO_VARARGS
 SDL_DYNAPI_PROC(size_t,SDL_IOprintf,(SDL_IOStream *a, SDL_PRINTF_FORMAT_STRING const char *b, ...),(a,b),return)
 SDL_DYNAPI_PROC(void,SDL_Log,(SDL_PRINTF_FORMAT_STRING const char *a, ...),(a),)
@@ -46,7 +46,7 @@ SDL_DYNAPI_PROC(int,SDL_sscanf,(const char *a, SDL_SCANF_FORMAT_STRING const cha
 SDL_DYNAPI_PROC(int,SDL_swprintf,(SDL_OUT_Z_CAP(b) wchar_t *a, size_t b, SDL_PRINTF_FORMAT_STRING const wchar_t *c, ...),(a,b,c),return)
 #endif
 
-/* New API symbols are added at the end */
+// New API symbols are added at the end
 SDL_DYNAPI_PROC(SDL_Surface*,SDL_AcquireCameraFrame,(SDL_Camera *a, Uint64 *b),(a,b),return)
 SDL_DYNAPI_PROC(int,SDL_AddEventWatch,(SDL_EventFilter a, void *b),(a,b),return)
 SDL_DYNAPI_PROC(int,SDL_AddGamepadMapping,(const char *a),(a),return)
@@ -792,7 +792,7 @@ SDL_DYNAPI_PROC(int,SDL_SetStringProperty,(SDL_PropertiesID a, const char *b, co
 SDL_DYNAPI_PROC(int,SDL_SetSurfaceAlphaMod,(SDL_Surface *a, Uint8 b),(a,b),return)
 SDL_DYNAPI_PROC(int,SDL_SetSurfaceBlendMode,(SDL_Surface *a, SDL_BlendMode b),(a,b),return)
 SDL_DYNAPI_PROC(SDL_bool,SDL_SetSurfaceClipRect,(SDL_Surface *a, const SDL_Rect *b),(a,b),return)
-SDL_DYNAPI_PROC(int,SDL_SetSurfaceColorKey,(SDL_Surface *a, int b, Uint32 c),(a,b,c),return)
+SDL_DYNAPI_PROC(int,SDL_SetSurfaceColorKey,(SDL_Surface *a, SDL_bool b, Uint32 c),(a,b,c),return)
 SDL_DYNAPI_PROC(int,SDL_SetSurfaceColorMod,(SDL_Surface *a, Uint8 b, Uint8 c, Uint8 d),(a,b,c,d),return)
 SDL_DYNAPI_PROC(int,SDL_SetSurfaceColorspace,(SDL_Surface *a, SDL_Colorspace b),(a,b),return)
 SDL_DYNAPI_PROC(int,SDL_SetSurfacePalette,(SDL_Surface *a, SDL_Palette *b),(a,b),return)
@@ -1130,33 +1130,33 @@ SDL_DYNAPI_PROC(void,SDL_GpuBindVertexStorageBuffers,(SDL_GpuRenderPass *a, Uint
 SDL_DYNAPI_PROC(void,SDL_GpuBindFragmentSamplers,(SDL_GpuRenderPass *a, Uint32 b, SDL_GpuTextureSamplerBinding *c, Uint32 d),(a,b,c,d),)
 SDL_DYNAPI_PROC(void,SDL_GpuBindFragmentStorageTextures,(SDL_GpuRenderPass *a, Uint32 b, SDL_GpuTexture **c, Uint32 d),(a,b,c,d),)
 SDL_DYNAPI_PROC(void,SDL_GpuBindFragmentStorageBuffers,(SDL_GpuRenderPass *a, Uint32 b, SDL_GpuBuffer **c, Uint32 d),(a,b,c,d),)
-SDL_DYNAPI_PROC(void,SDL_GpuDrawIndexedPrimitives,(SDL_GpuRenderPass *a, Uint32 b, Uint32 c, Uint32 d, Uint32 e),(a,b,c,d,e),)
-SDL_DYNAPI_PROC(void,SDL_GpuDrawPrimitives,(SDL_GpuRenderPass *a, Uint32 b, Uint32 c),(a,b,c),)
+SDL_DYNAPI_PROC(void,SDL_GpuDrawIndexedPrimitives,(SDL_GpuRenderPass *a, Uint32 b, Uint32 c, Uint32 d, Uint32 e, Uint32 f),(a,b,c,d,e,f),)
+SDL_DYNAPI_PROC(void,SDL_GpuDrawPrimitives,(SDL_GpuRenderPass *a, Uint32 b, Uint32 c, Uint32 d, Uint32 e),(a,b,c,d,e),)
 SDL_DYNAPI_PROC(void,SDL_GpuDrawPrimitivesIndirect,(SDL_GpuRenderPass *a, SDL_GpuBuffer *b, Uint32 c, Uint32 d, Uint32 e),(a,b,c,d,e),)
 SDL_DYNAPI_PROC(void,SDL_GpuDrawIndexedPrimitivesIndirect,(SDL_GpuRenderPass *a, SDL_GpuBuffer *b, Uint32 c, Uint32 d, Uint32 e),(a,b,c,d,e),)
 SDL_DYNAPI_PROC(void,SDL_GpuEndRenderPass,(SDL_GpuRenderPass *a),(a),)
-SDL_DYNAPI_PROC(SDL_GpuComputePass*,SDL_GpuBeginComputePass,(SDL_GpuCommandBuffer *a, SDL_GpuStorageTextureReadWriteBinding *b, Uint32 c, SDL_GpuStorageBufferReadWriteBinding *d, Uint32 e),(a,b,c,d,e),return)
+SDL_DYNAPI_PROC(SDL_GpuComputePass*,SDL_GpuBeginComputePass,(SDL_GpuCommandBuffer *a, SDL_GpuStorageTextureWriteOnlyBinding *b, Uint32 c, SDL_GpuStorageBufferWriteOnlyBinding *d, Uint32 e),(a,b,c,d,e),return)
 SDL_DYNAPI_PROC(void,SDL_GpuBindComputePipeline,(SDL_GpuComputePass *a, SDL_GpuComputePipeline *b),(a,b),)
 SDL_DYNAPI_PROC(void,SDL_GpuBindComputeStorageTextures,(SDL_GpuComputePass *a, Uint32 b, SDL_GpuTexture **c, Uint32 d),(a,b,c,d),)
 SDL_DYNAPI_PROC(void,SDL_GpuBindComputeStorageBuffers,(SDL_GpuComputePass *a, Uint32 b, SDL_GpuBuffer **c, Uint32 d),(a,b,c,d),)
 SDL_DYNAPI_PROC(void,SDL_GpuDispatchCompute,(SDL_GpuComputePass *a, Uint32 b, Uint32 c, Uint32 d),(a,b,c,d),)
 SDL_DYNAPI_PROC(void,SDL_GpuDispatchComputeIndirect,(SDL_GpuComputePass *a, SDL_GpuBuffer *b, Uint32 c),(a,b,c),)
 SDL_DYNAPI_PROC(void,SDL_GpuEndComputePass,(SDL_GpuComputePass *a),(a),)
-SDL_DYNAPI_PROC(void,SDL_GpuMapTransferBuffer,(SDL_GpuDevice *a, SDL_GpuTransferBuffer *b, SDL_bool c, void **d),(a,b,c,d),)
+SDL_DYNAPI_PROC(void*,SDL_GpuMapTransferBuffer,(SDL_GpuDevice *a, SDL_GpuTransferBuffer *b, SDL_bool c),(a,b,c),return)
 SDL_DYNAPI_PROC(void,SDL_GpuUnmapTransferBuffer,(SDL_GpuDevice *a, SDL_GpuTransferBuffer *b),(a,b),)
 SDL_DYNAPI_PROC(SDL_GpuCopyPass*,SDL_GpuBeginCopyPass,(SDL_GpuCommandBuffer *a),(a),return)
 SDL_DYNAPI_PROC(void,SDL_GpuUploadToTexture,(SDL_GpuCopyPass *a, SDL_GpuTextureTransferInfo *b, SDL_GpuTextureRegion *c, SDL_bool d),(a,b,c,d),)
 SDL_DYNAPI_PROC(void,SDL_GpuUploadToBuffer,(SDL_GpuCopyPass *a, SDL_GpuTransferBufferLocation *b, SDL_GpuBufferRegion *c, SDL_bool d),(a,b,c,d),)
 SDL_DYNAPI_PROC(void,SDL_GpuCopyTextureToTexture,(SDL_GpuCopyPass *a, SDL_GpuTextureLocation *b, SDL_GpuTextureLocation *c, Uint32 d, Uint32 e, Uint32 f, SDL_bool g),(a,b,c,d,e,f,g),)
 SDL_DYNAPI_PROC(void,SDL_GpuCopyBufferToBuffer,(SDL_GpuCopyPass *a, SDL_GpuBufferLocation *b, SDL_GpuBufferLocation *c, Uint32 d, SDL_bool e),(a,b,c,d,e),)
-SDL_DYNAPI_PROC(void,SDL_GpuGenerateMipmaps,(SDL_GpuCopyPass *a, SDL_GpuTexture *b),(a,b),)
+SDL_DYNAPI_PROC(void,SDL_GpuGenerateMipmaps,(SDL_GpuCommandBuffer *a, SDL_GpuTexture *b),(a,b),)
 SDL_DYNAPI_PROC(void,SDL_GpuDownloadFromTexture,(SDL_GpuCopyPass *a, SDL_GpuTextureRegion *b, SDL_GpuTextureTransferInfo *c),(a,b,c),)
 SDL_DYNAPI_PROC(void,SDL_GpuDownloadFromBuffer,(SDL_GpuCopyPass *a, SDL_GpuBufferRegion *b, SDL_GpuTransferBufferLocation *c),(a,b,c),)
 SDL_DYNAPI_PROC(void,SDL_GpuEndCopyPass,(SDL_GpuCopyPass *a),(a),)
-SDL_DYNAPI_PROC(void,SDL_GpuBlit,(SDL_GpuCommandBuffer *a, SDL_GpuTextureRegion *b, SDL_GpuTextureRegion *c, SDL_GpuFilter d, SDL_bool e),(a,b,c,d,e),)
+SDL_DYNAPI_PROC(void,SDL_GpuBlit,(SDL_GpuCommandBuffer *a, SDL_GpuBlitRegion *b, SDL_GpuBlitRegion *c, SDL_FlipMode d, SDL_GpuFilter e, SDL_bool f),(a,b,c,d,e,f),)
 SDL_DYNAPI_PROC(SDL_bool,SDL_GpuSupportsSwapchainComposition,(SDL_GpuDevice *a, SDL_Window *b, SDL_GpuSwapchainComposition c),(a,b,c),return)
 SDL_DYNAPI_PROC(SDL_bool,SDL_GpuSupportsPresentMode,(SDL_GpuDevice *a, SDL_Window *b, SDL_GpuPresentMode c),(a,b,c),return)
-SDL_DYNAPI_PROC(SDL_bool,SDL_GpuClaimWindow,(SDL_GpuDevice *a, SDL_Window *b, SDL_GpuSwapchainComposition c, SDL_GpuPresentMode d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_GpuClaimWindow,(SDL_GpuDevice *a, SDL_Window *b),(a,b),return)
 SDL_DYNAPI_PROC(void,SDL_GpuUnclaimWindow,(SDL_GpuDevice *a, SDL_Window *b),(a,b),)
 SDL_DYNAPI_PROC(SDL_bool,SDL_GpuSetSwapchainParameters,(SDL_GpuDevice *a, SDL_Window *b, SDL_GpuSwapchainComposition c, SDL_GpuPresentMode d),(a,b,c,d),return)
 SDL_DYNAPI_PROC(SDL_GpuTextureFormat,SDL_GpuGetSwapchainTextureFormat,(SDL_GpuDevice *a, SDL_Window *b),(a,b),return)
@@ -1169,4 +1169,4 @@ SDL_DYNAPI_PROC(SDL_bool,SDL_GpuQueryFence,(SDL_GpuDevice *a, SDL_GpuFence *b),(
 SDL_DYNAPI_PROC(void,SDL_GpuReleaseFence,(SDL_GpuDevice *a, SDL_GpuFence *b),(a,b),)
 SDL_DYNAPI_PROC(Uint32,SDL_GpuTextureFormatTexelBlockSize,(SDL_GpuTextureFormat a),(a),return)
 SDL_DYNAPI_PROC(SDL_bool,SDL_GpuSupportsTextureFormat,(SDL_GpuDevice *a, SDL_GpuTextureFormat b, SDL_GpuTextureType c, SDL_GpuTextureUsageFlags d),(a,b,c,d),return)
-SDL_DYNAPI_PROC(SDL_GpuSampleCount,SDL_GpuGetBestSampleCount,(SDL_GpuDevice *a, SDL_GpuTextureFormat b, SDL_GpuSampleCount c),(a,b,c),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_GpuSupportsSampleCount,(SDL_GpuDevice *a, SDL_GpuTextureFormat b, SDL_GpuSampleCount c),(a,b,c),return)

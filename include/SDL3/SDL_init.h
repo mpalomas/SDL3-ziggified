@@ -31,6 +31,7 @@
 
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_error.h>
+#include <SDL3/SDL_events.h>
 
 #include <SDL3/SDL_begin_code.h>
 /* Set up for C function definitions, even when using C++ */
@@ -69,17 +70,28 @@ typedef Uint32 SDL_InitFlags;
 /**
  * Return values for optional main callbacks.
  *
+ * Returning SDL_APP_SUCCESS or SDL_APP_FAILURE from SDL_AppInit,
+ * SDL_AppEvent, or SDL_AppIterate will terminate the program and report
+ * success/failure to the operating system. What that means is
+ * platform-dependent. On Unix, for example, on success, the process error
+ * code will be zero, and on failure it will be 1. This interface doesn't
+ * allow you to return specific exit codes, just whether there was an error
+ * generally or not.
+ *
+ * Returning SDL_APP_CONTINUE from these functions will let the app continue
+ * to run.
+ *
  * See
- * https://wiki.libsdl.org/SDL3/README/main-functions#main-callbacks-in-sdl3
- * for details.
+ * [Main callbacks in SDL3](https://wiki.libsdl.org/SDL3/README/main-functions#main-callbacks-in-sdl3)
+ * for complete details.
  *
  * \since This enum is available since SDL 3.0.0.
  */
 typedef enum SDL_AppResult
 {
-    SDL_APP_CONTINUE,   /** Value that requests that the app continue from the main callbacks. If SDL_AppInit, SDL_AppEvent, or SDL_AppIterate returns this value, the program will continue to run. */
-    SDL_APP_SUCCESS,    /** Value that requests termination with success from the main callbacks. If SDL_AppInit, SDL_AppEvent, or SDL_AppIterate returns this value, the program will terminate and report success to the operating system. What that success looks like is platform-dependent. On Unix, for example, the process error code will be zero. */
-    SDL_APP_FAILURE     /** Value that requests termination with error from the main callbacks. If SDL_AppInit, SDL_AppEvent, or SDL_AppIterate returns this value, the program will terminate and report failure to the operating system. What that failure looks like is platform-dependent. On Unix, for example, the process error code will be non-zero. */
+    SDL_APP_CONTINUE,   /** Value that requests that the app continue from the main callbacks. */
+    SDL_APP_SUCCESS,    /** Value that requests termination with success from the main callbacks. */
+    SDL_APP_FAILURE     /** Value that requests termination with error from the main callbacks. */
 } SDL_AppResult;
 
 typedef SDL_AppResult (SDLCALL *SDL_AppInit_func)(void **appstate, int argc, char *argv[]);

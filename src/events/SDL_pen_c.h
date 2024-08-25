@@ -83,7 +83,7 @@ extern int SDL_SendPenButton(Uint64 timestamp, SDL_PenID instance_id, const SDL_
 extern SDL_PenID SDL_FindPenByHandle(void *handle);
 
 // Backend can optionally use this to find a SDL_PenID, selected by a callback examining all devices. Zero if not found.
-extern SDL_PenID SDL_FindPenByCallback(SDL_bool (*callback)(void *handle, void *userdata), void *userdata);
+extern SDL_PenID SDL_FindPenByCallback(bool (*callback)(void *handle, void *userdata), void *userdata);
 
 // Backend can use this to map an axis to a capability bit.
 SDL_PenCapabilityFlags SDL_GetPenCapabilityFromAxis(SDL_PenAxis axis);
@@ -94,6 +94,6 @@ extern int SDL_InitPen(void);
 // Higher-level SDL video subsystem code calls this when shutting down. Backends shouldn't.
 extern void SDL_QuitPen(void);
 
-#endif /* SDL_pen_c_h_ */
+#endif // SDL_pen_c_h_
 
-/* vi: set ts=4 sw=4 expandtab: */
+// vi: set ts=4 sw=4 expandtab:

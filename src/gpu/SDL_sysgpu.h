@@ -24,7 +24,7 @@
 #ifndef SDL_GPU_DRIVER_H
 #define SDL_GPU_DRIVER_H
 
-/* Common Struct */
+/* Common Structs */
 
 typedef struct Pass
 {
@@ -48,45 +48,68 @@ typedef struct TextureCommonHeader
     SDL_GpuTextureCreateInfo info;
 } TextureCommonHeader;
 
+typedef struct BlitFragmentUniforms
+{
+    /* texcoord space */
+    float left;
+    float top;
+    float width;
+    float height;
+
+    Uint32 mipLevel;
+    float layerOrDepth;
+} BlitFragmentUniforms;
+
+typedef struct BlitPipelineCacheEntry
+{
+    SDL_GpuTextureType type;
+    SDL_GpuTextureFormat format;
+    SDL_GpuGraphicsPipeline *pipeline;
+} BlitPipelineCacheEntry;
+
 /* Internal Helper Utilities */
+
+#define SDL_GPU_TEXTUREFORMAT_MAX (SDL_GPU_TEXTUREFORMAT_D32_FLOAT_S8_UINT + 1)
+#define SDL_GPU_SWAPCHAINCOMPOSITION_MAX (SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2048 + 1)
+#define SDL_GPU_PRESENTMODE_MAX (SDL_GPU_PRESENTMODE_MAILBOX + 1)
 
 static inline Sint32 Texture_GetBlockSize(
     SDL_GpuTextureFormat format)
 {
     switch (format) {
-    case SDL_GPU_TEXTUREFORMAT_BC1:
-    case SDL_GPU_TEXTUREFORMAT_BC2:
-    case SDL_GPU_TEXTUREFORMAT_BC3:
-    case SDL_GPU_TEXTUREFORMAT_BC7:
-    case SDL_GPU_TEXTUREFORMAT_BC3_SRGB:
-    case SDL_GPU_TEXTUREFORMAT_BC7_SRGB:
+    case SDL_GPU_TEXTUREFORMAT_BC1_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_BC2_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_BC3_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_BC7_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_BC3_UNORM_SRGB:
+    case SDL_GPU_TEXTUREFORMAT_BC7_UNORM_SRGB:
         return 4;
-    case SDL_GPU_TEXTUREFORMAT_R8G8B8A8:
-    case SDL_GPU_TEXTUREFORMAT_B8G8R8A8:
-    case SDL_GPU_TEXTUREFORMAT_B5G6R5:
-    case SDL_GPU_TEXTUREFORMAT_B5G5R5A1:
-    case SDL_GPU_TEXTUREFORMAT_B4G4R4A4:
-    case SDL_GPU_TEXTUREFORMAT_R10G10B10A2:
-    case SDL_GPU_TEXTUREFORMAT_R16G16:
-    case SDL_GPU_TEXTUREFORMAT_R16G16B16A16:
-    case SDL_GPU_TEXTUREFORMAT_R8:
-    case SDL_GPU_TEXTUREFORMAT_A8:
+    case SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_B5G6R5_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_B5G5R5A1_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_B4G4R4A4_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_R10G10B10A2_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_R16G16_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_R16G16B16A16_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_R8_UNORM:
+    case SDL_GPU_TEXTUREFORMAT_A8_UNORM:
     case SDL_GPU_TEXTUREFORMAT_R8G8_SNORM:
     case SDL_GPU_TEXTUREFORMAT_R8G8B8A8_SNORM:
-    case SDL_GPU_TEXTUREFORMAT_R16_SFLOAT:
-    case SDL_GPU_TEXTUREFORMAT_R16G16_SFLOAT:
-    case SDL_GPU_TEXTUREFORMAT_R16G16B16A16_SFLOAT:
-    case SDL_GPU_TEXTUREFORMAT_R32_SFLOAT:
-    case SDL_GPU_TEXTUREFORMAT_R32G32_SFLOAT:
-    case SDL_GPU_TEXTUREFORMAT_R32G32B32A32_SFLOAT:
+    case SDL_GPU_TEXTUREFORMAT_R16_FLOAT:
+    case SDL_GPU_TEXTUREFORMAT_R16G16_FLOAT:
+    case SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT:
+    case SDL_GPU_TEXTUREFORMAT_R32_FLOAT:
+    case SDL_GPU_TEXTUREFORMAT_R32G32_FLOAT:
+    case SDL_GPU_TEXTUREFORMAT_R32G32B32A32_FLOAT:
     case SDL_GPU_TEXTUREFORMAT_R8_UINT:
     case SDL_GPU_TEXTUREFORMAT_R8G8_UINT:
     case SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UINT:
     case SDL_GPU_TEXTUREFORMAT_R16_UINT:
     case SDL_GPU_TEXTUREFORMAT_R16G16_UINT:
     case SDL_GPU_TEXTUREFORMAT_R16G16B16A16_UINT:
-    case SDL_GPU_TEXTUREFORMAT_R8G8B8A8_SRGB:
-    case SDL_GPU_TEXTUREFORMAT_B8G8R8A8_SRGB:
+    case SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB:
+    case SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM_SRGB:
         return 1;
     default:
         SDL_assert_release(!"Unrecognized TextureFormat!");
@@ -100,9 +123,9 @@ static inline SDL_bool IsDepthFormat(
     switch (format) {
     case SDL_GPU_TEXTUREFORMAT_D16_UNORM:
     case SDL_GPU_TEXTUREFORMAT_D24_UNORM:
-    case SDL_GPU_TEXTUREFORMAT_D32_SFLOAT:
+    case SDL_GPU_TEXTUREFORMAT_D32_FLOAT:
     case SDL_GPU_TEXTUREFORMAT_D24_UNORM_S8_UINT:
-    case SDL_GPU_TEXTUREFORMAT_D32_SFLOAT_S8_UINT:
+    case SDL_GPU_TEXTUREFORMAT_D32_FLOAT_S8_UINT:
         return SDL_TRUE;
 
     default:
@@ -115,7 +138,7 @@ static inline SDL_bool IsStencilFormat(
 {
     switch (format) {
     case SDL_GPU_TEXTUREFORMAT_D24_UNORM_S8_UINT:
-    case SDL_GPU_TEXTUREFORMAT_D32_SFLOAT_S8_UINT:
+    case SDL_GPU_TEXTUREFORMAT_D32_FLOAT_S8_UINT:
         return SDL_TRUE;
 
     default:
@@ -151,10 +174,10 @@ static inline Uint32 BytesPerRow(
 {
     Uint32 blocksPerRow = width;
 
-    if (format == SDL_GPU_TEXTUREFORMAT_BC1 ||
-        format == SDL_GPU_TEXTUREFORMAT_BC2 ||
-        format == SDL_GPU_TEXTUREFORMAT_BC3 ||
-        format == SDL_GPU_TEXTUREFORMAT_BC7) {
+    if (format == SDL_GPU_TEXTUREFORMAT_BC1_UNORM ||
+        format == SDL_GPU_TEXTUREFORMAT_BC2_UNORM ||
+        format == SDL_GPU_TEXTUREFORMAT_BC3_UNORM ||
+        format == SDL_GPU_TEXTUREFORMAT_BC7_UNORM) {
         blocksPerRow = (width + 3) / 4;
     }
 
@@ -169,10 +192,10 @@ static inline Sint32 BytesPerImage(
     Uint32 blocksPerRow = width;
     Uint32 blocksPerColumn = height;
 
-    if (format == SDL_GPU_TEXTUREFORMAT_BC1 ||
-        format == SDL_GPU_TEXTUREFORMAT_BC2 ||
-        format == SDL_GPU_TEXTUREFORMAT_BC3 ||
-        format == SDL_GPU_TEXTUREFORMAT_BC7) {
+    if (format == SDL_GPU_TEXTUREFORMAT_BC1_UNORM ||
+        format == SDL_GPU_TEXTUREFORMAT_BC2_UNORM ||
+        format == SDL_GPU_TEXTUREFORMAT_BC3_UNORM ||
+        format == SDL_GPU_TEXTUREFORMAT_BC7_UNORM) {
         blocksPerRow = (width + 3) / 4;
         blocksPerColumn = (height + 3) / 4;
     }
@@ -193,6 +216,57 @@ static inline Sint32 BytesPerImage(
 #define MAX_COLOR_TARGET_BINDINGS      4
 #define MAX_PRESENT_COUNT              16
 #define MAX_FRAMES_IN_FLIGHT           3
+
+/* Internal Macros */
+
+#define EXPAND_ARRAY_IF_NEEDED(arr, elementType, newCount, capacity, newCapacity) \
+    if (newCount >= capacity) {                                                   \
+        capacity = newCapacity;                                                   \
+        arr = (elementType *)SDL_realloc(                                         \
+            arr,                                                                  \
+            sizeof(elementType) * capacity);                                      \
+    }
+
+/* Internal Declarations */
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+SDL_GpuGraphicsPipeline *SDL_Gpu_FetchBlitPipeline(
+    SDL_GpuDevice *device,
+    SDL_GpuTextureType sourceTextureType,
+    SDL_GpuTextureFormat destinationFormat,
+    SDL_GpuShader *blitVertexShader,
+    SDL_GpuShader *blitFrom2DShader,
+    SDL_GpuShader *blitFrom2DArrayShader,
+    SDL_GpuShader *blitFrom3DShader,
+    SDL_GpuShader *blitFromCubeShader,
+    BlitPipelineCacheEntry **blitPipelines,
+    Uint32 *blitPipelineCount,
+    Uint32 *blitPipelineCapacity);
+
+void SDL_Gpu_BlitCommon(
+    SDL_GpuCommandBuffer *commandBuffer,
+    SDL_GpuBlitRegion *source,
+    SDL_GpuBlitRegion *destination,
+    SDL_FlipMode flipMode,
+    SDL_GpuFilter filterMode,
+    SDL_bool cycle,
+    SDL_GpuSampler *blitLinearSampler,
+    SDL_GpuSampler *blitNearestSampler,
+    SDL_GpuShader *blitVertexShader,
+    SDL_GpuShader *blitFrom2DShader,
+    SDL_GpuShader *blitFrom2DArrayShader,
+    SDL_GpuShader *blitFrom3DShader,
+    SDL_GpuShader *blitFromCubeShader,
+    BlitPipelineCacheEntry **blitPipelines,
+    Uint32 *blitPipelineCount,
+    Uint32 *blitPipelineCapacity);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 /* SDL_GpuDevice Definition */
 
@@ -373,12 +447,15 @@ struct SDL_GpuDevice
         Uint32 baseVertex,
         Uint32 startIndex,
         Uint32 vertexCount,
-        Uint32 instanceCount);
+        Uint32 instanceCount,
+        Uint32 baseInstance);
 
     void (*DrawPrimitives)(
         SDL_GpuCommandBuffer *commandBuffer,
         Uint32 vertexStart,
-        Uint32 vertexCount);
+        Uint32 vertexCount,
+        Uint32 instanceCount,
+        Uint32 baseInstance);
 
     void (*DrawPrimitivesIndirect)(
         SDL_GpuCommandBuffer *commandBuffer,
@@ -401,9 +478,9 @@ struct SDL_GpuDevice
 
     void (*BeginComputePass)(
         SDL_GpuCommandBuffer *commandBuffer,
-        SDL_GpuStorageTextureReadWriteBinding *storageTextureBindings,
+        SDL_GpuStorageTextureWriteOnlyBinding *storageTextureBindings,
         Uint32 storageTextureBindingCount,
-        SDL_GpuStorageBufferReadWriteBinding *storageBufferBindings,
+        SDL_GpuStorageBufferWriteOnlyBinding *storageBufferBindings,
         Uint32 storageBufferBindingCount);
 
     void (*BindComputePipeline)(
@@ -444,11 +521,10 @@ struct SDL_GpuDevice
 
     /* TransferBuffer Data */
 
-    void (*MapTransferBuffer)(
+    void *(*MapTransferBuffer)(
         SDL_GpuRenderer *device,
         SDL_GpuTransferBuffer *transferBuffer,
-        SDL_bool cycle,
-        void **ppData);
+        SDL_bool cycle);
 
     void (*UnmapTransferBuffer)(
         SDL_GpuRenderer *device,
@@ -506,8 +582,9 @@ struct SDL_GpuDevice
 
     void (*Blit)(
         SDL_GpuCommandBuffer *commandBuffer,
-        SDL_GpuTextureRegion *source,
-        SDL_GpuTextureRegion *destination,
+        SDL_GpuBlitRegion *source,
+        SDL_GpuBlitRegion *destination,
+        SDL_FlipMode flipMode,
         SDL_GpuFilter filterMode,
         SDL_bool cycle);
 
@@ -525,9 +602,7 @@ struct SDL_GpuDevice
 
     SDL_bool (*ClaimWindow)(
         SDL_GpuRenderer *driverData,
-        SDL_Window *window,
-        SDL_GpuSwapchainComposition swapchainComposition,
-        SDL_GpuPresentMode presentMode);
+        SDL_Window *window);
 
     void (*UnclaimWindow)(
         SDL_GpuRenderer *driverData,
@@ -583,7 +658,7 @@ struct SDL_GpuDevice
         SDL_GpuTextureType type,
         SDL_GpuTextureUsageFlags usage);
 
-    SDL_GpuSampleCount (*GetBestSampleCount)(
+    SDL_bool (*SupportsSampleCount)(
         SDL_GpuRenderer *driverData,
         SDL_GpuTextureFormat format,
         SDL_GpuSampleCount desiredSampleCount);
@@ -676,7 +751,7 @@ struct SDL_GpuDevice
     ASSIGN_DRIVER_FUNC(QueryFence, name)                    \
     ASSIGN_DRIVER_FUNC(ReleaseFence, name)                  \
     ASSIGN_DRIVER_FUNC(SupportsTextureFormat, name)         \
-    ASSIGN_DRIVER_FUNC(GetBestSampleCount, name)
+    ASSIGN_DRIVER_FUNC(SupportsSampleCount, name)
 
 typedef struct SDL_GpuBootstrap
 {

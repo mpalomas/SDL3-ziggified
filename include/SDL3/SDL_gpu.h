@@ -78,36 +78,97 @@ typedef enum SDL_GpuIndexElementSize
     SDL_GPU_INDEXELEMENTSIZE_32BIT
 } SDL_GpuIndexElementSize;
 
+/* Texture format support varies depending on driver, hardware, and usage flags.
+ * In general, you should use SDL_GpuSupportsTextureFormat to query if a format
+ * is supported before using it. However, there are a few guaranteed formats.
+ *
+ * For SAMPLER usage, the following formats are universally supported:
+ *  - R8G8B8A8_UNORM
+ *  - B8G8R8A8_UNORM
+ *  - R8_UNORM
+ *  - R8G8_SNORM
+ *  - R8G8B8A8_SNORM
+ *  - R16_FLOAT
+ *  - R16G16_FLOAT
+ *  - R16G16B16A16_FLOAT
+ *  - R32_FLOAT
+ *  - R32G32_FLOAT
+ *  - R32G32B32A32_FLOAT
+ *  - R8G8B8A8_UNORM_SRGB
+ *  - B8G8R8A8_UNORM_SRGB
+ *  - D16_UNORM
+ *
+ * For COLOR_TARGET usage, the following formats are universally supported:
+ *  - R8G8B8A8_UNORM
+ *  - B8G8R8A8_UNORM
+ *  - R8_UNORM
+ *  - R16_FLOAT
+ *  - R16G16_FLOAT
+ *  - R16G16B16A16_FLOAT
+ *  - R32_FLOAT
+ *  - R32G32_FLOAT
+ *  - R32G32B32A32_FLOAT
+ *  - R8_UINT
+ *  - R8G8_UINT
+ *  - R8G8B8A8_UINT
+ *  - R16_UINT
+ *  - R16G16_UINT
+ *  - R16G16B16A16_UINT
+ *  - R8G8B8A8_UNORM_SRGB
+ *  - B8G8R8A8_UNORM_SRGB
+ *
+ * For STORAGE usages, the following formats are universally supported:
+ *  - R8G8B8A8_UNORM
+ *  - R8G8B8A8_SNORM
+ *  - R16G16B16A16_FLOAT
+ *  - R32_FLOAT
+ *  - R32G32_FLOAT
+ *  - R32G32B32A32_FLOAT
+ *  - R8_UINT
+ *  - R8G8_UINT
+ *  - R8G8B8A8_UINT
+ *  - R16_UINT
+ *  - R16G16_UINT
+ *  - R16G16B16A16_UINT
+ *
+ * For DEPTH_STENCIL_TARGET usage, the following formats are universally supported:
+ *  - D16_UNORM
+ *  - Either (but not necessarily both!) D24_UNORM or D32_SFLOAT
+ *  - Either (but not necessarily both!) D24_UNORM_S8_UINT or D32_SFLOAT_S8_UINT
+ *
+ * Unless D16_UNORM is sufficient for your purposes, always check which
+ * of D24/D32 is supported before creating a depth-stencil texture!
+ */
 typedef enum SDL_GpuTextureFormat
 {
     SDL_GPU_TEXTUREFORMAT_INVALID = -1,
 
     /* Unsigned Normalized Float Color Formats */
-    SDL_GPU_TEXTUREFORMAT_R8G8B8A8,
-    SDL_GPU_TEXTUREFORMAT_B8G8R8A8,
-    SDL_GPU_TEXTUREFORMAT_B5G6R5,
-    SDL_GPU_TEXTUREFORMAT_B5G5R5A1,
-    SDL_GPU_TEXTUREFORMAT_B4G4R4A4,
-    SDL_GPU_TEXTUREFORMAT_R10G10B10A2,
-    SDL_GPU_TEXTUREFORMAT_R16G16,
-    SDL_GPU_TEXTUREFORMAT_R16G16B16A16,
-    SDL_GPU_TEXTUREFORMAT_R8,
-    SDL_GPU_TEXTUREFORMAT_A8,
+    SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
+    SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM,
+    SDL_GPU_TEXTUREFORMAT_B5G6R5_UNORM,
+    SDL_GPU_TEXTUREFORMAT_B5G5R5A1_UNORM,
+    SDL_GPU_TEXTUREFORMAT_B4G4R4A4_UNORM,
+    SDL_GPU_TEXTUREFORMAT_R10G10B10A2_UNORM,
+    SDL_GPU_TEXTUREFORMAT_R16G16_UNORM,
+    SDL_GPU_TEXTUREFORMAT_R16G16B16A16_UNORM,
+    SDL_GPU_TEXTUREFORMAT_R8_UNORM,
+    SDL_GPU_TEXTUREFORMAT_A8_UNORM,
     /* Compressed Unsigned Normalized Float Color Formats */
-    SDL_GPU_TEXTUREFORMAT_BC1,
-    SDL_GPU_TEXTUREFORMAT_BC2,
-    SDL_GPU_TEXTUREFORMAT_BC3,
-    SDL_GPU_TEXTUREFORMAT_BC7,
+    SDL_GPU_TEXTUREFORMAT_BC1_UNORM,
+    SDL_GPU_TEXTUREFORMAT_BC2_UNORM,
+    SDL_GPU_TEXTUREFORMAT_BC3_UNORM,
+    SDL_GPU_TEXTUREFORMAT_BC7_UNORM,
     /* Signed Normalized Float Color Formats  */
     SDL_GPU_TEXTUREFORMAT_R8G8_SNORM,
     SDL_GPU_TEXTUREFORMAT_R8G8B8A8_SNORM,
     /* Signed Float Color Formats */
-    SDL_GPU_TEXTUREFORMAT_R16_SFLOAT,
-    SDL_GPU_TEXTUREFORMAT_R16G16_SFLOAT,
-    SDL_GPU_TEXTUREFORMAT_R16G16B16A16_SFLOAT,
-    SDL_GPU_TEXTUREFORMAT_R32_SFLOAT,
-    SDL_GPU_TEXTUREFORMAT_R32G32_SFLOAT,
-    SDL_GPU_TEXTUREFORMAT_R32G32B32A32_SFLOAT,
+    SDL_GPU_TEXTUREFORMAT_R16_FLOAT,
+    SDL_GPU_TEXTUREFORMAT_R16G16_FLOAT,
+    SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT,
+    SDL_GPU_TEXTUREFORMAT_R32_FLOAT,
+    SDL_GPU_TEXTUREFORMAT_R32G32_FLOAT,
+    SDL_GPU_TEXTUREFORMAT_R32G32B32A32_FLOAT,
     /* Unsigned Integer Color Formats */
     SDL_GPU_TEXTUREFORMAT_R8_UINT,
     SDL_GPU_TEXTUREFORMAT_R8G8_UINT,
@@ -115,18 +176,18 @@ typedef enum SDL_GpuTextureFormat
     SDL_GPU_TEXTUREFORMAT_R16_UINT,
     SDL_GPU_TEXTUREFORMAT_R16G16_UINT,
     SDL_GPU_TEXTUREFORMAT_R16G16B16A16_UINT,
-    /* SRGB Color Formats */
-    SDL_GPU_TEXTUREFORMAT_R8G8B8A8_SRGB,
-    SDL_GPU_TEXTUREFORMAT_B8G8R8A8_SRGB,
-    /* Compressed SRGB Color Formats */
-    SDL_GPU_TEXTUREFORMAT_BC3_SRGB,
-    SDL_GPU_TEXTUREFORMAT_BC7_SRGB,
+    /* SRGB Unsigned Normalized Color Formats */
+    SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB,
+    SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM_SRGB,
+    /* Compressed SRGB Unsigned Normalized Color Formats */
+    SDL_GPU_TEXTUREFORMAT_BC3_UNORM_SRGB,
+    SDL_GPU_TEXTUREFORMAT_BC7_UNORM_SRGB,
     /* Depth Formats */
     SDL_GPU_TEXTUREFORMAT_D16_UNORM,
     SDL_GPU_TEXTUREFORMAT_D24_UNORM,
-    SDL_GPU_TEXTUREFORMAT_D32_SFLOAT,
+    SDL_GPU_TEXTUREFORMAT_D32_FLOAT,
     SDL_GPU_TEXTUREFORMAT_D24_UNORM_S8_UINT,
-    SDL_GPU_TEXTUREFORMAT_D32_SFLOAT_S8_UINT
+    SDL_GPU_TEXTUREFORMAT_D32_FLOAT_S8_UINT
 } SDL_GpuTextureFormat;
 
 typedef enum SDL_GpuTextureUsageFlagBits
@@ -196,7 +257,7 @@ typedef enum SDL_GpuShaderFormatFlagBits
     SDL_GPU_SHADERFORMAT_INVALID = 0x00000000,
     SDL_GPU_SHADERFORMAT_SECRET = 0x00000001,   /* NDA'd platforms */
     SDL_GPU_SHADERFORMAT_SPIRV = 0x00000002,    /* Vulkan */
-    SDL_GPU_SHADERFORMAT_DXBC = 0x00000004,     /* D3D11, D3D12 */
+    SDL_GPU_SHADERFORMAT_DXBC = 0x00000004,     /* D3D11 (Shader Model 5_0) */
     SDL_GPU_SHADERFORMAT_DXIL = 0x00000008,     /* D3D12 */
     SDL_GPU_SHADERFORMAT_MSL = 0x00000010,      /* Metal */
     SDL_GPU_SHADERFORMAT_METALLIB = 0x00000020, /* Metal */
@@ -206,19 +267,59 @@ typedef Uint32 SDL_GpuShaderFormat;
 
 typedef enum SDL_GpuVertexElementFormat
 {
+    /* 32-bit Signed Integers */
+    SDL_GPU_VERTEXELEMENTFORMAT_INT,
+    SDL_GPU_VERTEXELEMENTFORMAT_INT2,
+    SDL_GPU_VERTEXELEMENTFORMAT_INT3,
+    SDL_GPU_VERTEXELEMENTFORMAT_INT4,
+
+    /* 32-bit Unsigned Integers */
     SDL_GPU_VERTEXELEMENTFORMAT_UINT,
+    SDL_GPU_VERTEXELEMENTFORMAT_UINT2,
+    SDL_GPU_VERTEXELEMENTFORMAT_UINT3,
+    SDL_GPU_VERTEXELEMENTFORMAT_UINT4,
+
+    /* 32-bit Floats */
     SDL_GPU_VERTEXELEMENTFORMAT_FLOAT,
-    SDL_GPU_VERTEXELEMENTFORMAT_VECTOR2,
-    SDL_GPU_VERTEXELEMENTFORMAT_VECTOR3,
-    SDL_GPU_VERTEXELEMENTFORMAT_VECTOR4,
-    SDL_GPU_VERTEXELEMENTFORMAT_COLOR,
+    SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2,
+    SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3,
+    SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4,
+
+    /* 8-bit Signed Integers */
+    SDL_GPU_VERTEXELEMENTFORMAT_BYTE2,
     SDL_GPU_VERTEXELEMENTFORMAT_BYTE4,
+
+    /* 8-bit Unsigned Integers */
+    SDL_GPU_VERTEXELEMENTFORMAT_UBYTE2,
+    SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4,
+
+    /* 8-bit Signed Normalized */
+    SDL_GPU_VERTEXELEMENTFORMAT_BYTE2_NORM,
+    SDL_GPU_VERTEXELEMENTFORMAT_BYTE4_NORM,
+
+    /* 8-bit Unsigned Normalized */
+    SDL_GPU_VERTEXELEMENTFORMAT_UBYTE2_NORM,
+    SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM,
+
+    /* 16-bit Signed Integers */
     SDL_GPU_VERTEXELEMENTFORMAT_SHORT2,
     SDL_GPU_VERTEXELEMENTFORMAT_SHORT4,
-    SDL_GPU_VERTEXELEMENTFORMAT_NORMALIZEDSHORT2,
-    SDL_GPU_VERTEXELEMENTFORMAT_NORMALIZEDSHORT4,
-    SDL_GPU_VERTEXELEMENTFORMAT_HALFVECTOR2,
-    SDL_GPU_VERTEXELEMENTFORMAT_HALFVECTOR4
+
+    /* 16-bit Unsigned Integers */
+    SDL_GPU_VERTEXELEMENTFORMAT_USHORT2,
+    SDL_GPU_VERTEXELEMENTFORMAT_USHORT4,
+
+    /* 16-bit Signed Normalized */
+    SDL_GPU_VERTEXELEMENTFORMAT_SHORT2_NORM,
+    SDL_GPU_VERTEXELEMENTFORMAT_SHORT4_NORM,
+
+    /* 16-bit Unsigned Normalized */
+    SDL_GPU_VERTEXELEMENTFORMAT_USHORT2_NORM,
+    SDL_GPU_VERTEXELEMENTFORMAT_USHORT4_NORM,
+
+    /* 16-bit Floats */
+    SDL_GPU_VERTEXELEMENTFORMAT_HALF2,
+    SDL_GPU_VERTEXELEMENTFORMAT_HALF4
 } SDL_GpuVertexElementFormat;
 
 typedef enum SDL_GpuVertexInputRate
@@ -304,7 +405,7 @@ typedef enum SDL_GpuColorComponentFlagBits
     SDL_GPU_COLORCOMPONENT_A_BIT = 0x00000008
 } SDL_GpuColorComponentFlagBits;
 
-typedef Uint32 SDL_GpuColorComponentFlags;
+typedef Uint8 SDL_GpuColorComponentFlags;
 
 typedef enum SDL_GpuFilter
 {
@@ -381,7 +482,7 @@ typedef enum SDL_GpuDriver
 typedef struct SDL_GpuDepthStencilValue
 {
     float depth;
-    Uint32 stencil;
+    Uint8 stencil;
 } SDL_GpuDepthStencilValue;
 
 typedef struct SDL_GpuViewport
@@ -431,6 +532,17 @@ typedef struct SDL_GpuTextureRegion
     Uint32 d;
 } SDL_GpuTextureRegion;
 
+typedef struct SDL_GpuBlitRegion
+{
+    SDL_GpuTexture *texture;
+    Uint32 mipLevel;
+    Uint32 layerOrDepthPlane;
+    Uint32 x;
+    Uint32 y;
+    Uint32 w;
+    Uint32 h;
+} SDL_GpuBlitRegion;
+
 typedef struct SDL_GpuBufferLocation
 {
     SDL_GpuBuffer *buffer;
@@ -444,6 +556,11 @@ typedef struct SDL_GpuBufferRegion
     Uint32 size;
 } SDL_GpuBufferRegion;
 
+/* Note that the `firstVertex` and `firstInstance` parameters are NOT compatible with
+ * built-in vertex/instance ID variables in shaders (for example, SV_VertexID). If
+ * your shader depends on these variables, the correlating draw call parameter MUST
+ * be 0.
+ */
 typedef struct SDL_GpuIndirectDrawCommand
 {
     Uint32 vertexCount;   /* number of vertices to draw */
@@ -494,7 +611,7 @@ typedef struct SDL_GpuVertexBinding
     Uint32 binding;
     Uint32 stride;
     SDL_GpuVertexInputRate inputRate;
-    Uint32 stepRate;
+    Uint32 instanceStepRate; /* ignored unless inputRate is INSTANCE */
 } SDL_GpuVertexBinding;
 
 typedef struct SDL_GpuVertexAttribute
@@ -550,15 +667,14 @@ typedef struct SDL_GpuShaderCreateInfo
 
 typedef struct SDL_GpuTextureCreateInfo
 {
-    Uint32 width;
-    Uint32 height;
-    Uint32 depth;
     SDL_GpuTextureType type;
-    Uint32 layerCount;
-    Uint32 levelCount;
-    SDL_GpuSampleCount sampleCount;
     SDL_GpuTextureFormat format;
     SDL_GpuTextureUsageFlags usageFlags;
+    Uint32 width;
+    Uint32 height;
+    Uint32 layerCountOrDepth;
+    Uint32 levelCount;
+    SDL_GpuSampleCount sampleCount;
 
     SDL_PropertiesID props;
 } SDL_GpuTextureCreateInfo;
@@ -613,9 +729,9 @@ typedef struct SDL_GpuDepthStencilState
     SDL_bool stencilTestEnable;
     SDL_GpuStencilOpState backStencilState;
     SDL_GpuStencilOpState frontStencilState;
-    Uint32 compareMask;
-    Uint32 writeMask;
-    Uint32 reference;
+    Uint8 compareMask;
+    Uint8 writeMask;
+    Uint8 reference;
 } SDL_GpuDepthStencilState;
 
 typedef struct SDL_GpuColorAttachmentDescription
@@ -655,8 +771,8 @@ typedef struct SDL_GpuComputePipelineCreateInfo
     SDL_GpuShaderFormat format;
     Uint32 readOnlyStorageTextureCount;
     Uint32 readOnlyStorageBufferCount;
-    Uint32 readWriteStorageTextureCount;
-    Uint32 readWriteStorageBufferCount;
+    Uint32 writeOnlyStorageTextureCount;
+    Uint32 writeOnlyStorageBufferCount;
     Uint32 uniformBufferCount;
     Uint32 threadCountX;
     Uint32 threadCountY;
@@ -780,15 +896,15 @@ typedef struct SDL_GpuTextureSamplerBinding
     SDL_GpuSampler *sampler;
 } SDL_GpuTextureSamplerBinding;
 
-typedef struct SDL_GpuStorageBufferReadWriteBinding
+typedef struct SDL_GpuStorageBufferWriteOnlyBinding
 {
     SDL_GpuBuffer *buffer;
 
     /* if SDL_TRUE, cycles the buffer if it is bound. */
     SDL_bool cycle;
-} SDL_GpuStorageBufferReadWriteBinding;
+} SDL_GpuStorageBufferWriteOnlyBinding;
 
-typedef struct SDL_GpuStorageTextureReadWriteBinding
+typedef struct SDL_GpuStorageTextureWriteOnlyBinding
 {
     SDL_GpuTexture *texture;
     Uint32 mipLevel;
@@ -796,7 +912,7 @@ typedef struct SDL_GpuStorageTextureReadWriteBinding
 
     /* if SDL_TRUE, cycles the texture if the texture is bound. */
     SDL_bool cycle;
-} SDL_GpuStorageTextureReadWriteBinding;
+} SDL_GpuStorageTextureWriteOnlyBinding;
 
 /* Functions */
 
@@ -894,22 +1010,27 @@ extern SDL_DECLSPEC SDL_GpuDriver SDLCALL SDL_GpuGetDriver(SDL_GpuDevice *device
  * Shader resource bindings must be authored to follow a particular order.
  * For SPIR-V shaders, use the following resource sets:
  *  0: Read-only storage textures, followed by read-only storage buffers
- *  1: Read-write storage textures, followed by read-write storage buffers
+ *  1: Write-only storage textures, followed by write-only storage buffers
  *  2: Uniform buffers
  *
- * For HLSL/DXBC/DXIL, use the following order:
+ * For DXBC Shader Model 5_0 shaders, use the following register order:
  *  For t registers:
  *   Read-only storage textures, followed by read-only storage buffers
+ *  For u registers:
+ *   Write-only storage textures, followed by write-only storage buffers
  *  For b registers:
  *   Uniform buffers
- *  For u registers:
- *   Read-write storage textures, followed by read-write storage buffers
+ *
+ * For DXIL shaders, use the following register order:
+ *  (t[n], space0): Read-only storage textures, followed by read-only storage buffers
+ *  (u[n], space1): Write-only storage textures, followed by write-only storage buffers
+ *  (b[n], space2): Uniform buffers
  *
  * For MSL/metallib, use the following order:
  *  For [[buffer]]:
- *   Uniform buffers, followed by read-only storage buffers, followed by read-write storage buffers
+ *   Uniform buffers, followed by write-only storage buffers, followed by write-only storage buffers
  *  For [[texture]]:
- *   Read-only storage textures, followed by read-write storage textures
+ *   Read-only storage textures, followed by write-only storage textures
  *
  * \param device a GPU Context
  * \param computePipelineCreateInfo a struct describing the state of the requested compute pipeline
@@ -972,7 +1093,7 @@ extern SDL_DECLSPEC SDL_GpuSampler *SDLCALL SDL_GpuCreateSampler(
  *   2: Sampled textures, followed by storage textures, followed by storage buffers
  *   3: Uniform buffers
  *
- * For DXBC Shader Model 5.0 shaders, use the following register order:
+ * For DXBC Shader Model 5_0 shaders, use the following register order:
  *  For t registers:
  *   Sampled textures, followed by storage textures, followed by storage buffers
  *  For s registers:
@@ -980,7 +1101,7 @@ extern SDL_DECLSPEC SDL_GpuSampler *SDLCALL SDL_GpuCreateSampler(
  *  For b registers:
  *   Uniform buffers
  *
- * For DXBC/DXIL Shader Model 5.1+ shaders, use the following register order:
+ * For DXIL shaders, use the following register order:
  *  For vertex shaders:
  *   (t[n], space0): Sampled textures, followed by storage textures, followed by storage buffers
  *   (s[n], space0): Samplers with indices corresponding to the sampled textures
@@ -1023,14 +1144,6 @@ extern SDL_DECLSPEC SDL_GpuShader *SDLCALL SDL_GpuCreateShader(
  *
  * If you request a sample count higher than the hardware supports,
  * the implementation will automatically fall back to the highest available sample count.
- *
- * For depth textures, the hardware support matrix looks as follows:
- * - D16_UNORM is guaranteed to always be supported.
- * - It's guaranteed that either D24_UNORM or D32_SFLOAT will be supported.
- * - It's guaranteed that either D24_UNORM_S8_UINT or D32_SFLOAT_S8_UINT will be supported.
- * Therefore, unless D16 is sufficient for your purposes, you should always call
- * SDL_GpuSupportsTextureFormat to determine which of D24/D32 are supported by the GPU
- * before creating a depth texture.
  *
  * \param device a GPU Context
  * \param textureCreateInfo a struct describing the state of the texture to create
@@ -1609,6 +1722,11 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuBindFragmentStorageBuffers(
  * Draws data using bound graphics state with an index buffer and instancing enabled.
  * You must not call this function before binding a graphics pipeline.
  *
+ * Note that the `baseVertex` and `baseInstance` parameters are NOT compatible with
+ * built-in vertex/instance ID variables in shaders (for example, SV_VertexID). If
+ * your shader depends on these variables, the correlating draw call parameter MUST
+ * be 0.
+ *
  * \param renderPass a render pass handle
  * \param baseVertex the starting offset to read from the vertex buffer
  * \param startIndex the starting offset to read from the index buffer
@@ -1622,22 +1740,31 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuDrawIndexedPrimitives(
     Uint32 baseVertex,
     Uint32 startIndex,
     Uint32 vertexCount,
-    Uint32 instanceCount);
+    Uint32 instanceCount,
+    Uint32 baseInstance);
 
 /**
  * Draws data using bound graphics state.
  * You must not call this function before binding a graphics pipeline.
  *
+ * Note that the `vertexStart` and `baseInstance` parameters are NOT compatible with
+ * built-in vertex/instance ID variables in shaders (for example, SV_VertexID). If
+ * your shader depends on these variables, the correlating draw call parameter MUST
+ * be 0.
+ *
  * \param renderPass a render pass handle
  * \param vertexStart The starting offset to read from the vertex buffer
  * \param vertexCount The number of vertices to draw
+ * \param instanceCount The number of instances that will be drawn
  *
  * \since This function is available since SDL 3.x.x
  */
 extern SDL_DECLSPEC void SDLCALL SDL_GpuDrawPrimitives(
     SDL_GpuRenderPass *renderPass,
     Uint32 vertexStart,
-    Uint32 vertexCount);
+    Uint32 vertexCount,
+    Uint32 instanceCount,
+    Uint32 baseInstance);
 
 /**
  * Draws data using bound graphics state and with draw parameters set from a buffer.
@@ -1699,16 +1826,22 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuEndRenderPass(
  * A compute pass is defined by a set of texture subresources and buffers that
  * will be written to by compute pipelines.
  * These textures and buffers must have been created with the COMPUTE_STORAGE_WRITE bit.
- * If these resources will also be read during the pass, they must be created with the COMPUTE_STORAGE_READ bit.
  * All operations related to compute pipelines must take place inside of a compute pass.
  * You must not begin another compute pass, or a render pass or copy pass
  * before ending the compute pass.
+ *
+ * A VERY IMPORTANT NOTE
+ * Textures and buffers bound as write-only MUST NOT be read from during
+ * the compute pass. Doing so will result in undefined behavior.
+ * If your compute work requires reading the output from a previous dispatch,
+ * you MUST end the current compute pass and begin a new one before you can
+ * safely access the data.
  *
  * \param commandBuffer a command buffer
  * \param storageTextureBindings an array of writeable storage texture binding structs
  * \param storageTextureBindingCount the number of storage textures to bind from the array
  * \param storageBufferBindings an array of writeable storage buffer binding structs
- * \param storageBufferBindingCount an array of read-write storage buffer binding structs
+ * \param storageBufferBindingCount the number of storage buffers to bind from the array
  *
  * \returns a compute pass handle
  *
@@ -1718,9 +1851,9 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuEndRenderPass(
  */
 extern SDL_DECLSPEC SDL_GpuComputePass *SDLCALL SDL_GpuBeginComputePass(
     SDL_GpuCommandBuffer *commandBuffer,
-    SDL_GpuStorageTextureReadWriteBinding *storageTextureBindings,
+    SDL_GpuStorageTextureWriteOnlyBinding *storageTextureBindings,
     Uint32 storageTextureBindingCount,
-    SDL_GpuStorageBufferReadWriteBinding *storageBufferBindings,
+    SDL_GpuStorageBufferWriteOnlyBinding *storageBufferBindings,
     Uint32 storageBufferBindingCount);
 
 /**
@@ -1835,15 +1968,14 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuEndComputePass(
  * \param device a GPU context
  * \param transferBuffer a transfer buffer
  * \param cycle if SDL_TRUE, cycles the transfer buffer if it is bound
- * \param ppData where to store the address of the mapped transfer buffer memory
+ * \returns the address of the mapped transfer buffer memory
  *
  * \since This function is available since SDL 3.x.x
  */
-extern SDL_DECLSPEC void SDLCALL SDL_GpuMapTransferBuffer(
+extern SDL_DECLSPEC void *SDLCALL SDL_GpuMapTransferBuffer(
     SDL_GpuDevice *device,
     SDL_GpuTransferBuffer *transferBuffer,
-    SDL_bool cycle,
-    void **ppData);
+    SDL_bool cycle);
 
 /**
  * Unmaps a previously mapped transfer buffer.
@@ -1961,18 +2093,6 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuCopyBufferToBuffer(
     SDL_bool cycle);
 
 /**
- * Generates mipmaps for the given texture.
- *
- * \param copyPass a copy pass handle
- * \param texture a texture with more than 1 mip level
- *
- * \since This function is available since SDL 3.x.x
- */
-extern SDL_DECLSPEC void SDLCALL SDL_GpuGenerateMipmaps(
-    SDL_GpuCopyPass *copyPass,
-    SDL_GpuTexture *texture);
-
-/**
  * Copies data from a texture to a transfer buffer on the GPU timeline.
  * This data is not guaranteed to be copied until the command buffer fence is signaled.
  *
@@ -2013,12 +2133,26 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuEndCopyPass(
     SDL_GpuCopyPass *copyPass);
 
 /**
+ * Generates mipmaps for the given texture.
+ * This function must not be called inside of any pass.
+ *
+ * \param commandBuffer a commandBuffer
+ * \param texture a texture with more than 1 mip level
+ *
+ * \since This function is available since SDL 3.x.x
+ */
+extern SDL_DECLSPEC void SDLCALL SDL_GpuGenerateMipmaps(
+    SDL_GpuCommandBuffer *commandBuffer,
+    SDL_GpuTexture *texture);
+
+/**
  * Blits from a source texture region to a destination texture region.
- * This function must not be called inside of any render, compute, or copy pass.
+ * This function must not be called inside of any pass.
  *
  * \param commandBuffer a command buffer
  * \param source the texture region to copy from
  * \param destination the texture region to copy to
+ * \param flipMode the flip mode for the source texture region
  * \param filterMode the filter mode that will be used when blitting
  * \param cycle if SDL_TRUE, cycles the destination texture if the destination texture is bound, otherwise overwrites the data.
  *
@@ -2027,15 +2161,17 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuEndCopyPass(
  */
 extern SDL_DECLSPEC void SDLCALL SDL_GpuBlit(
     SDL_GpuCommandBuffer *commandBuffer,
-    SDL_GpuTextureRegion *source,
-    SDL_GpuTextureRegion *destination,
+    SDL_GpuBlitRegion *source,
+    SDL_GpuBlitRegion *destination,
+    SDL_FlipMode flipMode,
     SDL_GpuFilter filterMode,
     SDL_bool cycle);
 
 /* Submission/Presentation */
 
 /**
- * Obtains whether or not a swapchain composition is supported by the GPU backend.
+ * Determines whether a swapchain composition is supported by the window.
+ * The window must be claimed before calling this function.
  *
  * \param device a GPU context
  * \param window an SDL_Window
@@ -2044,6 +2180,8 @@ extern SDL_DECLSPEC void SDLCALL SDL_GpuBlit(
  * \returns SDL_TRUE if supported, SDL_FALSE if unsupported (or on error)
  *
  * \since This function is available since SDL 3.x.x
+ *
+ * \sa SDL_GpuClaimWindow
  */
 extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsSwapchainComposition(
     SDL_GpuDevice *device,
@@ -2051,7 +2189,8 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsSwapchainComposition(
     SDL_GpuSwapchainComposition swapchainComposition);
 
 /**
- * Obtains whether or not a presentation mode is supported by the GPU backend.
+ * Determines whether a presentation mode is supported by the window.
+ * The window must be claimed before calling this function.
  *
  * \param device a GPU context
  * \param window an SDL_Window
@@ -2060,6 +2199,8 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsSwapchainComposition(
  * \returns SDL_TRUE if supported, SDL_FALSE if unsupported (or on error)
  *
  * \since This function is available since SDL 3.x.x
+ *
+ * \sa SDL_GpuClaimWindow
  */
 extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsPresentMode(
     SDL_GpuDevice *device,
@@ -2070,18 +2211,12 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsPresentMode(
  * Claims a window, creating a swapchain structure for it.
  * This must be called before SDL_GpuAcquireSwapchainTexture is called using the window.
  *
- * This function will fail if the requested present mode or swapchain composition
- * are unsupported by the device. Check if the parameters are supported via
- * SDL_GpuSupportsPresentMode / SDL_GpuSupportsSwapchainComposition prior to
- * calling this function.
- *
- * SDL_GPU_PRESENTMODE_VSYNC and SDL_GPU_SWAPCHAINCOMPOSITION_SDR are
- * always supported.
+ * The swapchain will be created with SDL_GPU_SWAPCHAINCOMPOSITION_SDR and SDL_GPU_PRESENTMODE_VSYNC.
+ * If you want to have different swapchain parameters, you must call
+ * SetSwapchainParameters after claiming the window.
  *
  * \param device a GPU context
  * \param window an SDL_Window
- * \param swapchainComposition the desired composition of the swapchain
- * \param presentMode the desired present mode for the swapchain
  *
  * \returns SDL_TRUE on success, otherwise SDL_FALSE.
  *
@@ -2094,9 +2229,7 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsPresentMode(
  */
 extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuClaimWindow(
     SDL_GpuDevice *device,
-    SDL_Window *window,
-    SDL_GpuSwapchainComposition swapchainComposition,
-    SDL_GpuPresentMode presentMode);
+    SDL_Window *window);
 
 /**
  * Unclaims a window, destroying its swapchain structure.
@@ -2308,20 +2441,19 @@ extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsTextureFormat(
     SDL_GpuTextureUsageFlags usage);
 
 /**
- * Determines the "best" sample count for a texture format, i.e.
- * the highest supported sample count that is <= the desired sample count.
+ * Determines if a sample count for a texture format is supported.
  *
  * \param device a GPU context
  * \param format the texture format to check
- * \param desiredSampleCount the sample count you want
+ * \param sampleCount the sample count to check
  * \returns a hardware-specific version of min(preferred, possible)
  *
  * \since This function is available since SDL 3.x.x
  */
-extern SDL_DECLSPEC SDL_GpuSampleCount SDLCALL SDL_GpuGetBestSampleCount(
+extern SDL_DECLSPEC SDL_bool SDLCALL SDL_GpuSupportsSampleCount(
     SDL_GpuDevice *device,
     SDL_GpuTextureFormat format,
-    SDL_GpuSampleCount desiredSampleCount);
+    SDL_GpuSampleCount sampleCount);
 
 #ifdef __cplusplus
 }

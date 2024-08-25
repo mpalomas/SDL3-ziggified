@@ -70,8 +70,8 @@ pub fn build(b: *std.Build) void {
         defer files.deinit();
 
         const config_header = b.addConfigHeader(.{
-            .style = .{ .cmake = b.path("include/SDL_build_config.h.cmake") },
-            .include_path = "SDL_config.h",
+            .style = .{ .cmake = b.path("include/build_config/SDL_build_config_minimal.h.cmake") },
+            .include_path = "SDL_build_config.h",
         }, .{
             .HAVE_CONST = 1,
             .HAVE_INLINE = 1,
@@ -198,6 +198,7 @@ pub fn build(b: *std.Build) void {
             .SDL_THREAD_GENERIC_RWLOCK_SUFFIX = 0,
             .SDL_THREAD_PTHREAD = 1,
             .SDL_THREAD_PTHREAD_RECURSIVE_MUTEX = 1,
+
             .SDL_THREAD_PTHREAD_RECURSIVE_MUTEX_NP = 0,
             .SDL_THREAD_WINDOWS = 0,
             .SDL_THREAD_VITA = 0,
@@ -236,9 +237,9 @@ pub fn build(b: *std.Build) void {
         lib.installConfigHeader(config_header);
 
         const revision_header = b.addConfigHeader(.{
-            .style = .{ .cmake = b.path("include/SDL_revision.h.cmake") },
+            .style = .{ .cmake = b.path("include/build_config/SDL_revision.h.cmake") },
             .include_path = "SDL_revision.h",
-        }, .{ .SDL_REVISION = "gpu-head", .SDL_VENDOR_INFO = "" });
+        }, .{ .SDL_REVISION = "gpu_next-95bf26e3a", .SDL_VENDOR_INFO = "" });
         lib.addConfigHeader(revision_header);
         lib.installConfigHeader(revision_header);
     }
@@ -1038,16 +1039,6 @@ const linux_options = [_]SdlOption{
         .src_files = &.{
             "src/render/opengl/SDL_render_gl.c",
             "src/render/opengl/SDL_shaders_gl.c",
-        },
-        .system_libs = &.{},
-    },
-    .{
-        .name = "render_driver_ogl_es",
-        .desc = "enable the opengl es render driver",
-        .default = true,
-        .sdl_configs = &.{"SDL_VIDEO_RENDER_OGL_ES"},
-        .src_files = &.{
-            "src/render/opengles/SDL_render_gles.c",
         },
         .system_libs = &.{},
     },
